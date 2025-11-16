@@ -7,7 +7,7 @@ import { envs } from '../config/env';
 @Injectable()
 export class NotificationBusService extends BaseBusService {
   get queueName(): string {
-    return "queue-alertas";
+    return "queue-alert";
   }
 
   get queueConnection(): string {
