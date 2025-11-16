@@ -1,0 +1,23 @@
+{
+  "files": [],
+  "references": [
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.node.json" }
+  ]
+}
+
+{
+  "compilerOptions": {
+    "module": "commonjs",        
+    "target": "es2019",           
+    "strict": true,              
+    "moduleResolution": "node",  
+    "esModuleInterop": true,     
+    "skipLibCheck": true,        
+    "outDir": "./dist",          
+    "rootDir": "./src",          
+    "sourceMap": true            
+  },
+  "include": ["src/*/.ts", "prisma/*/.ts"], 
+  "exclude": ["node_modules"]               
+}
