@@ -8,6 +8,7 @@ interface EnvVars {
   SERVICE_BUS_CONNECTION_STRING: string;
   AUTH_SERVICE_BUS_CONNECTION_STRING: string;
   CHAT_SERVICE_BUS_CONNECTION_STRING: string;
+  DATA_BASE: string;
 }
 const envsSchema = joi
   .object({
@@ -17,6 +18,7 @@ const envsSchema = joi
     SERVICE_BUS_CONNECTION_STRING: joi.string().required(),
     AUTH_SERVICE_BUS_CONNECTION_STRING: joi.string().required(),
     CHAT_SERVICE_BUS_CONNECTION_STRING: joi.string().required(),
+    DATA_BASE: joi.string().required(),
   })
   .unknown(true);
 const result = envsSchema.validate(process.env);
@@ -32,4 +34,5 @@ export const envs = {
   servicebusconnectionstring: envVars.SERVICE_BUS_CONNECTION_STRING,
   authservicebusconnectionstring: envVars.AUTH_SERVICE_BUS_CONNECTION_STRING,
   chatservicebusconnectionstring: envVars.CHAT_SERVICE_BUS_CONNECTION_STRING,
+  database: envVars.DATA_BASE,
 };
