@@ -21,7 +21,7 @@ export class Notification {
   @Column({ type: 'boolean', default: false })
   read!: boolean;
 
-  @CreateDateColumn({ type: 'datetime' })
+  @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt!: Date;
 
   @Column({ type: 'simple-json', nullable: true })
