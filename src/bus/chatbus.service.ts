@@ -3,9 +3,14 @@ import { Injectable } from '@nestjs/common';
 import { BaseBusService } from '../common/base-bus.service';
 import { MailService } from '../mail/mail.service';
 import { envs } from '../config/env';
+import { NotificationService } from 'src/notification/notification.service';
 
 @Injectable()
 export class ChatBusService extends BaseBusService {
+
+  constructor(protected readonly mailService: MailService, protected readonly notificationService: NotificationService) {
+    super(mailService, notificationService);
+  }
 
   get queueName(): string {
     return "queue-chat";
@@ -19,18 +24,9 @@ export class ChatBusService extends BaseBusService {
     return 'Chat Service Bus';
   }
 
-  constructor(protected readonly mailService: MailService) {
-    super(mailService);
-  }
-
   protected async processMessage(message: any): Promise<void> {
     const messageContent = this.extractMessageContent(message);
 
-    // await this.mailService.sendTemplateMail({
-    //   to: messageContent.email,
-    //   name: messageContent.name,
-    //   template: messageContent.template,
-    //   context: { ...messageContent }
-    // });
+    await this.notificationService.crearNotificacion(messageContent.email, messageContent.template, messageContent.resumen);
   }
 }
