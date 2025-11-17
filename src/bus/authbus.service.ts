@@ -3,9 +3,14 @@ import { Injectable } from '@nestjs/common';
 import { BaseBusService } from '../common/base-bus.service';
 import { MailService } from '../mail/mail.service';
 import { envs } from '../config/env';
+import { NotificationService } from 'src/notification/notification.service';
 
 @Injectable()
 export class AuthBusService extends BaseBusService {
+
+  constructor(protected readonly mailService: MailService, protected readonly notificationService: NotificationService) {
+    super(mailService, notificationService);
+  }
 
   get queueName(): string {
     return "queue-auth";
@@ -19,10 +24,6 @@ export class AuthBusService extends BaseBusService {
     return 'Auth Service Bus';
   }
 
-  constructor(protected readonly mailService: MailService) {
-    super(mailService);
-  }
-
   protected async processMessage(message: any): Promise<void> {
     const messageContent = this.extractMessageContent(message);
 
@@ -32,5 +33,9 @@ export class AuthBusService extends BaseBusService {
       template: messageContent.template,
       context: { ...messageContent }
     });
+    if(messageContent.template === 'nuevoUsuario'){
+      await this.notificationService.crearUsuario(messageContent.id, messageContent.email, messageContent.name);
+    }
+
   }
 }

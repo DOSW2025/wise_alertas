@@ -2,6 +2,7 @@
 import { Injectable, OnModuleInit, OnModuleDestroy, Logger } from '@nestjs/common';
 import { ServiceBusClient, ServiceBusReceiver } from '@azure/service-bus';
 import { MailService } from '../mail/mail.service';
+import { NotificationService } from '../notification/notification.service';
 
 @Injectable()
 export abstract class BaseBusService implements OnModuleInit, OnModuleDestroy {
@@ -13,7 +14,7 @@ export abstract class BaseBusService implements OnModuleInit, OnModuleDestroy {
   abstract get queueConnection(): string;
   abstract get serviceName(): string;
 
-  constructor(protected readonly mailService: MailService) {
+  constructor(protected readonly mailService: MailService, protected readonly notificationService: NotificationService) {
     this.logger = new Logger(this.constructor.name);
   }
 

@@ -25,7 +25,7 @@ export class NotificationController {
   })
   async unreadCount(@Param('userId') userId: string) {
     const unreadCount = await this.notificationService.countUnread(userId);
-    return { unreadCount };
+    return unreadCount;
   }
 
   @Delete(':id')
