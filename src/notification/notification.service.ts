@@ -35,5 +35,34 @@ export class NotificationService {
     if (!res)
       throw new NotFoundException('Notificación no encontrada');
   }
+
+  async crearUsuario(id: string, mail: string, name: string): Promise<void> {
+    if (await this.prisma.user.findUnique({ where: { id: id } })) {
+      throw new Error('Usuario ya existe');
+    }
+    if (await this.prisma.user.findUnique({ where: { mail: mail } })) {
+      throw new Error('Email ya registrado');
+    }
+    await this.prisma.user.create({
+      data: {
+        id: id,
+        mail: mail,
+        name: name
+      }
+    });
+  }
   
+  async crearNotificacion(email: string, titulo: string, mensaje: string): Promise<void> {
+    const user = await this.prisma.user.findUnique({ where: { mail: email } });
+    if (!user) {
+      throw new NotFoundException('Usuario no encontrado para crear notificación');
+    }
+    await this.prisma.notification.create({
+      data: {
+        userId: user.id,
+        asunto: titulo,
+        resumen: mensaje,
+      }
+    });
+  }
 }

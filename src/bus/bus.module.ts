@@ -3,9 +3,10 @@ import { MailModule } from '../mail/mail.module';
 import { AuthBusService } from './authbus.service';
 import { NotificationBusService } from './generalbus.service';
 import { ChatBusService } from './chatbus.service';
+import { NotificationModule } from 'src/notification/notification.module';
 
 @Module({
-  imports: [MailModule],
+  imports: [MailModule, NotificationModule],
   providers: [
     AuthBusService,
     NotificationBusService,
