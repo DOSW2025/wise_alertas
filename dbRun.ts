@@ -1,7 +1,0 @@
-import { PrismaClient } from "@prisma/client";
-const prisma = new PrismaClient();
-
-async function main() {
-
-    // Example query to test the connectio
-}
