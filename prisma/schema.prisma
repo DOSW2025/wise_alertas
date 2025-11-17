@@ -5,29 +5,32 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
-  id     String @id @default(uuid()) @db.Uuid
-  nombre String @unique
-
+  id            String         @id
+  mail          String         @unique
+  name          String
   notifications Notification[]
 }
 
 model Notification {
-  id            String   @id @default(uuid()) @db.Uuid
-  userId        String   @db.Uuid //fk
+  id            Int      @unique @default(autoincrement())
+  userId        String   
   fechaCreacion DateTime @default(now())
   asunto        String
+  resumen       String
   visto         Boolean  @default(false)
-  contenido     Json
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@id([id, userId])
 }
+
