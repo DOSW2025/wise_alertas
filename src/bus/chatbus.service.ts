@@ -26,7 +26,8 @@ export class ChatBusService extends BaseBusService {
 
   protected async processMessage(message: any): Promise<void> {
     const messageContent = this.extractMessageContent(message);
-
-    await this.notificationService.crearNotificacion(messageContent.email, messageContent.template, messageContent.resumen);
+    
+    await this.notificationService.crearNotidicacionVariosUsuarios(messageContent)
   }
+
 }
