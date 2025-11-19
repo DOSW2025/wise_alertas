@@ -29,7 +29,6 @@ export class NotificationBusService extends BaseBusService {
 
     await this.mailService.sendMail(messageContent);
 
-    await this.notificationService.crearNotificacion(messageContent.email, messageContent.template, messageContent.resumen);
+    await this.notificationService.crearNotidicacionVariosUsuarios(messageContent)
   }
-
 }
