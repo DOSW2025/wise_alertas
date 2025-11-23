@@ -123,7 +123,7 @@ export class AlertaService {
     const compiled = hbs.compile(source);
     const html = compiled({...correo, year: new Date().getFullYear()});
 
-    const logoPath = path.join(process.cwd(), 'doc', 'imgs', 'logo.png');
+    const logoPath = path.join(process.cwd(), 'doc', 'imgs', 'logo.svg');
     const attachments: any[] = [];
 
     if (fs.existsSync(logoPath)) {
