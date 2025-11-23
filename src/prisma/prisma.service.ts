@@ -8,7 +8,6 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
 
   async onModuleInit() {
     try {
-      this.logger.log('Connecting to the database...');
       await this.$connect();
       this.logger.log('Conexión a la base de datos establecida.');
     } catch (error) {

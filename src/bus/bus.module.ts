@@ -1,21 +1,21 @@
 import { Module } from '@nestjs/common';
-import { MailModule } from '../mail/mail.module';
-import { AuthBusService } from './authbus.service';
-import { NotificationBusService } from './generalbus.service';
-import { ChatBusService } from './chatbus.service';
-import { NotificationModule } from 'src/notification/notification.module';
+import { MailEnvioIndividual } from './mailEnvioIndividual.service';
+import { MailEnvioRol } from './mailEnvioRol.service';
+import { MailEnvioMasivo } from './mailEnvioMasivo.service';
+import { AlertaModule } from 'src/alerta/alerta.module';
+
 
 @Module({
-  imports: [MailModule, NotificationModule],
+  imports: [AlertaModule],
   providers: [
-    AuthBusService,
-    NotificationBusService,
-    ChatBusService,
+    MailEnvioIndividual,
+    MailEnvioRol,
+    MailEnvioMasivo,
   ],
   exports: [
-    AuthBusService,
-    NotificationBusService,
-    ChatBusService,
+    MailEnvioIndividual,
+    MailEnvioRol,
+    MailEnvioMasivo,
   ],
 })
 export class BusModule {}

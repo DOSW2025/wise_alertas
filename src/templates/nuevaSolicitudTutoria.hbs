@@ -37,22 +37,12 @@
       line-height: 1.6;
     }
     .info-box {
-      background: #fff7e6;
-      border-left: 5px solid #cc8400;
+      background: #f0f6ff;
+      border-left: 5px solid #0066cc;
       padding: 16px;
       margin: 20px 0;
       border-radius: 6px;
       font-size: 15px;
-    }
-    .button {
-      display: inline-block;
-      padding: 12px 24px;
-      margin-top: 20px;
-      background: #990000;
-      color: #fff !important;
-      text-decoration: none;
-      border-radius: 6px;
-      font-weight: bold;
     }
     .footer {
       text-align: center;
@@ -68,31 +58,30 @@
 
     <div class="header">
       <img src="cid:logo" alt="ECIWISE Logo" />
-      <h2>Nueva Solicitud de Tutoría</h2>
+      <h2>Solicitud de Tutoría Recibida</h2>
     </div>
 
     <div class="content">
       <p>Hola <strong>{{name}}</strong>,</p>
 
       <p>
-        Has recibido una nueva solicitud de monitoría de <strong>{{studentName}}</strong>.
+        Hemos recibido tu solicitud de monitoría en <strong>ECIWISE</strong>. A continuación encontrarás la información registrada:
       </p>
 
       <div class="info-box">
-        <strong>📘 Detalles de la solicitud:</strong>
+        <strong>📘 Detalles de tu solicitud:</strong>
         <p style="margin: 8px 0 0;">
           • Materia: <strong>{{materia}}</strong><br>
           • Fecha solicitada: <strong>{{fecha}}</strong><br>
           • Hora : <strong>{{hora}}</strong><br>
-          • Mensaje del estudiante: <em>{{mensaje}}</em>
+          • Tutor seleccionado: <strong>{{tutor}}</strong><br>
+          • Modalidad seleccionada: <strong>{{modalidad}}</strong>
         </p>
       </div>
 
-      <div style="text-align:center;">
-        <a href="{{linkAtender}}" class="button">
-          Ver Solicitud en ECIWISE
-        </a>
-      </div>
+      <p>
+        El tutor revisará tu solicitud y recibirás una confirmación o reprogramación según su disponibilidad.
+      </p>
 
       <p style="margin-top: 24px; color: #999; font-size: 14px;">
         Este es un correo automático, por favor no respondas a este mensaje.

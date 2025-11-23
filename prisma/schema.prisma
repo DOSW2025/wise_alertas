@@ -1,38 +1,70 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
   output   = "../generated/prisma"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
 
-model User {
+model Rol {
+  id          Int       @id @default(autoincrement())
+  nombre      String    @unique
+  descripcion String?
+  activo      Boolean   @default(true)
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  usuarios    Usuario[]
+
+  @@map("roles")
+}
+
+model EstadoUsuario {
+  id          Int       @id @default(autoincrement())
+  nombre      String    @unique
+  descripcion String?
+  activo      Boolean   @default(true)
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  usuarios    Usuario[]
+
+  @@map("estados_usuario")
+}
+
+model Usuario {
   id            String         @id @default(uuid())
-  mail          String         @unique
-  name          String
+  email         String         @unique
+  nombre        String
+  apellido      String
+  telefono      String?
+  semestre      Int            @default(1)
+  ultimo_login  DateTime?      @map("ultimo_login")
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
+  avatar_url    String?        @map("avatar_url")
+  google_id     String?        @unique @map("google_id")
+  estadoId      Int            @default(1) @map("estado_id")
+  rolId         Int            @default(1) @map("rol_id")
   notifications Notification[]
-  
-  @@index([mail])
+  estado        EstadoUsuario  @relation(fields: [estadoId], references: [id])
+  rol           Rol            @relation(fields: [rolId], references: [id])
+
+  @@index([email])
+  @@index([estadoId])
+  @@index([rolId])
+  @@map("usuarios")
 }
 
 model Notification {
   id            Int      @unique @default(autoincrement())
-  userId        String   
+  userId        String
   fechaCreacion DateTime @default(now())
   asunto        String
   resumen       String
   visto         Boolean  @default(false)
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user          Usuario  @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([id, userId])
 }
-
