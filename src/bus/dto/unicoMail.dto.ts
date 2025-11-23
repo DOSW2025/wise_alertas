@@ -54,6 +54,14 @@ export class UnicoMailDto {
 
     @IsString()
     @IsOptional()
+    estudiante?: string;
+
+    @IsString()
+    @IsOptional()
+    mensaje?: string;
+
+    @IsString()
+    @IsOptional()
     modalidad?: string;
 
     @IsString()
