@@ -1,18 +1,18 @@
 import { Controller, Get, Param, Delete, Patch } from '@nestjs/common';
-import { NotificationService } from './notification.service';
 import { ApiTags, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
+import { AlertaService } from './alerta.service';
 
 @ApiTags('Notificaciones')
 @Controller('notificacion')
-export class NotificationController {
-  constructor(private readonly notificationService: NotificationService) {}
+export class AlertaController {
+  constructor(private readonly alertaService: AlertaService) {}
 
   @Get(':userId')
   @ApiOperation({ summary: 'Obtener notificaciones de un usuario' })
   @ApiParam({ name: 'userId', description: 'ID del usuario' })
   @ApiResponse({ status: 200, description: 'Lista de notificaciones' })
   async getByUser(@Param('userId') userId: string) {
-    const notifications = await this.notificationService.findByUser(userId);
+    const notifications = await this.alertaService.findByUser(userId);
     return notifications;
   }
 
@@ -24,7 +24,7 @@ export class NotificationController {
     description: 'Número de notificaciones no leídas',
   })
   async unreadCount(@Param('userId') userId: string) {
-    const unreadCount = await this.notificationService.countUnread(userId);
+    const unreadCount = await this.alertaService.countUnread(userId);
     return unreadCount;
   }
 
@@ -33,7 +33,7 @@ export class NotificationController {
   @ApiParam({ name: 'id', description: 'ID de la notificación' })
   @ApiResponse({ status: 200, description: 'Notificación eliminada' })
   async delete(@Param('id') id: string) {
-    await this.notificationService.deleteById(id);
+    await this.alertaService.deleteById(id);
     return { deleted: true };
   }
 
@@ -45,7 +45,7 @@ export class NotificationController {
     description: 'Cantidad de notificaciones marcadas como leídas',
   })
   async markAllRead(@Param('userId') userId: string) {
-    const updated = await this.notificationService.markAllRead(userId);
+    const updated = await this.alertaService.markAllRead(userId);
     return { updated };
   }
 
@@ -54,7 +54,7 @@ export class NotificationController {
   @ApiParam({ name: 'id', description: 'ID de la notificación' })
   @ApiResponse({ status: 200, description: 'Notificación marcada como leída' })
   async markRead(@Param('id') id: string) {
-    await this.notificationService.markRead(id);
+    await this.alertaService.markRead(id);
     return { markedRead: true };
   }
 }

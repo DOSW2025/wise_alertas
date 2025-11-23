@@ -4,7 +4,6 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
   <style>
     body {
       margin: 0;
@@ -36,13 +35,22 @@
       font-size: 16px;
       line-height: 1.6;
     }
-    .info-box {
-      background: #fff7e6;
-      border-left: 5px solid #cc8400;
+    .highlight-box {
+      background: #f8eaea;
+      border-left: 5px solid #990000;
       padding: 16px;
       margin: 20px 0;
       border-radius: 6px;
-      font-size: 15px;
+    }
+    .button {
+      display: inline-block;
+      padding: 12px 24px;
+      margin-top: 20px;
+      background: #990000;
+      color: #fff !important;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: bold;
     }
     .footer {
       text-align: center;
@@ -56,26 +64,37 @@
 <body>
   <div class="container">
 
+    <!-- HEADER -->
     <div class="header">
       <img src="cid:logo" alt="ECIWISE Logo" />
-      <h2>Nueva Solicitud de Tutoría</h2>
+      <h2>Cambio de Rol en ECIWISE</h2>
     </div>
 
+    <!-- CONTENT -->
     <div class="content">
       <p>Hola <strong>{{name}}</strong>,</p>
 
       <p>
-        Has recibido una nueva solicitud de monitoría de <strong>{{estudiante}}</strong>.
+        Te informamos que se ha realizado un cambio en tus permisos dentro del sistema
+        <strong>ECIWISE</strong>.
       </p>
 
-      <div class="info-box">
-        <strong>📘 Detalles de la solicitud:</strong>
-        <p style="margin: 8px 0 0;">
-          • Materia: <strong>{{materia}}</strong><br>
-          • Fecha solicitada: <strong>{{fecha}}</strong><br>
-          • Hora : <strong>{{hora}}</strong><br>
-          • Mensaje del estudiante: <em>{{mensaje}}</em>
+      <!-- HIGHLIGHT BOX -->
+      <div class="highlight-box">
+        <p style="margin: 0; font-size: 15px;">
+          <strong>Rol anterior:</strong> {{oldRole}} <br>
+          <strong>Nuevo rol asignado:</strong> {{newRole}}
         </p>
+      </div>
+
+      <p>
+        Este cambio afecta los privilegios disponibles en tu cuenta, incluyendo el acceso a
+        secciones específicas y la capacidad de realizar acciones administrativas.
+      </p>
+
+      <!-- CENTRAR BOTÓN -->
+      <div style="text-align: center;">
+        <a href="https://wise-front-git-develop-marianellapolo7-2222s-projects.vercel.app/?_vercel_share=ETZpfmG4JpnK7fzvXd8Li49OXSRSwNmM" class="button">Ir a ECIWISE</a>
       </div>
 
       <p style="margin-top: 24px; color: #999; font-size: 14px;">
@@ -83,6 +102,7 @@
       </p>
     </div>
 
+    <!-- FOOTER -->
     <div class="footer">
       © {{year}} ECIWISE — Todos los derechos reservados.
     </div>
