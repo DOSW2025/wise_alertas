@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { BaseBusService } from '../common/base-bus.service';
 import { AlertaService } from '../alerta/alerta.service';
 import { envs } from '../config/env';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { RolMailDto } from './dto/rolMail.dto';
 import { UnicoMailDto } from './dto/unicoMail.dto';
 import { User } from 'src/alerta/entitys/user.entity';
