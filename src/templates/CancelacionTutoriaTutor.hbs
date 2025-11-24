@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body { margin:0; padding:0; background:#f4f4f7; font-family:Arial, sans-serif; }
+    .container { max-width:600px; margin:auto; background:#fff; border-radius:8px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.1); }
+    .header { background:#8C0000; padding:24px; text-align:center; color:#fff; }
+    .header img { max-width:50px; margin-bottom:10px; }
+    .content { padding:24px; color:#333; font-size:16px; line-height:1.6; }
+    .footer { text-align:center; padding:20px; color:#777; font-size:13px; }
+    .info-box {
+      background: #ffecec;
+      border-left: 5px solid #cc0000;
+      padding: 16px;
+      margin: 20px 0;
+      border-radius: 6px;
+      color: #660000;
+      font-size: 15px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <!-- HEADER -->
+    <div class="header">
+      <img src="cid:logo" alt="ECIWISE Logo" />
+      <h2>Tutoría Cancelada</h2>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+      <p>Hola <strong>{{name}}</strong>,</p>
+
+      <p>
+        Queremos informarte que la tutoría programada con el estudiante <strong>{{tutor}}</strong> ha sido
+        <strong style="color:#8C0000;">cancelada</strong>.
+      </p>
+
+      <div class="info-box">
+        <strong>📘 Detalles de la tutoría:</strong>
+        <p style="margin: 8px 0 0;">
+          • Estudiante: <strong>{{tutor}}</strong><br>
+          • Materia: <strong>{{materia}}</strong><br>
+          • Fecha: <strong>{{fecha}}</strong><br>
+          • Hora : <strong>{{hora}}</strong><br>
+          • Modalidad: <strong>{{modalidad}}</strong><br>
+          • Motivo: <strong>{{razon}}</strong>
+        </p>
+      </div>
+
+      <p>
+        La cancelación puede deberse a cambios del estudiante o ajustes internos del sistema.
+      </p>
+
+      <p style="margin-top:24px; color:#999; font-size:14px;">
+        Este es un correo automático. Por favor no respondas a este mensaje.
+      </p>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+      © {{year}} ECIWISE — Todos los derechos reservados.
+    </div>
+
+  </div>
+</body>
+</html>
