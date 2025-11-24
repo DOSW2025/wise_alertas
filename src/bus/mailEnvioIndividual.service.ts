@@ -30,7 +30,12 @@ export class MailEnvioIndividual extends BaseBusService {
       this.logger.error('Mensaje inválido: contenido no encontrado o malformado.');
       return;
     }
-    if (!messageContent.mandarCorreo) {
+    
+    if (messageContent.mandarCorreo === undefined || messageContent.mandarCorreo === null) {
+      messageContent.mandarCorreo = true;
+    }
+
+    if (messageContent.mandarCorreo) {
       await this.alertaService.enviarCorreoIndividual(messageContent);
     }
     

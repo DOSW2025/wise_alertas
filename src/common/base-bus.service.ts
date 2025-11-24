@@ -63,7 +63,30 @@ export abstract class BaseBusService implements OnModuleInit, OnModuleDestroy{
         `[${this.serviceName}] Error procesando mensaje ${message.messageId}:`,
         error,
       );
-      await this.receiver.abandonMessage(message);
+      // Evitar reintentos infinitos: mover a DLQ cuando se excede el límite de entregas.
+      const maxDelivery = parseInt('3', 10);
+      const deliveryCount = (message.deliveryCount ?? 0) as number;
+
+      if (deliveryCount >= maxDelivery) {
+        try {
+          await this.receiver.deadLetterMessage(message, {
+            deadLetterReason: 'MaxDeliveryExceeded',
+            deadLetterErrorDescription: `Exceeded max delivery count (${deliveryCount} >= ${maxDelivery})`,
+          });
+          this.logger.warn(
+            `[${this.serviceName}] Mensaje ${message.messageId} enviado a DLQ después de ${deliveryCount} entregas`,
+          );
+        } catch (dlErr) {
+          this.logger.error(
+            `[${this.serviceName}] Error al mover mensaje ${message.messageId} a DLQ:`,
+            dlErr,
+          );
+          await this.receiver.abandonMessage(message);
+        }
+      } else {
+        // Abandonar para que el broker reprograme el mensaje (incrementa deliveryCount)
+        await this.receiver.abandonMessage(message);
+      }
     }
   }
 

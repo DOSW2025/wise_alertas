@@ -1,6 +1,6 @@
 import { IsString, IsArray, ValidateNested,IsBoolean, IsOptional } from 'class-validator';
 import { Type } from 'class-transformer';
-import { ReceptorDto } from '../../alerta/dto/receptor.dto';
+import { ReceptorDto } from './receptor.dto';
 import { ApiProperty } from '@nestjs/swagger';
 
 /**
