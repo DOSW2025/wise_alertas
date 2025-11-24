@@ -37,12 +37,22 @@
       line-height: 1.6;
     }
     .info-box {
-      background: #fff7e6;
-      border-left: 5px solid #cc8400;
+      background: #f0f6ff;
+      border-left: 5px solid #0066cc;
       padding: 16px;
       margin: 20px 0;
       border-radius: 6px;
       font-size: 15px;
+    }
+    .button {
+      display: inline-block;
+      padding: 12px 24px;
+      margin-top: 20px;
+      background: #990000;
+      color: #fff !important;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: bold;
     }
     .footer {
       text-align: center;
@@ -65,7 +75,7 @@
       <p>Hola <strong>{{name}}</strong>,</p>
 
       <p>
-        Has recibido una nueva solicitud de monitoría de <strong>{{estudiante}}</strong>.
+        Has recibido una nueva solicitud de monitoría de <strong>{{tutor}}</strong>.
       </p>
 
       <div class="info-box">
@@ -76,6 +86,12 @@
           • Hora : <strong>{{hora}}</strong><br>
           • Mensaje del estudiante: <em>{{mensaje}}</em>
         </p>
+      </div>
+      
+      <div style="text-align:center;">
+        <a href="{{linkAtender}}" class="button">
+          Ver Solicitud en ECIWISE
+        </a>
       </div>
 
       <p style="margin-top: 24px; color: #999; font-size: 14px;">

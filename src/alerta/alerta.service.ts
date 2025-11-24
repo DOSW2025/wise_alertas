@@ -1,4 +1,4 @@
-import {Injectable,Logger,NotFoundException} from '@nestjs/common';
+import {Injectable,Logger,NotFoundException,HttpException,HttpStatus} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { MailService as SendGridMailService } from '@sendgrid/mail';
 import { envs } from '../config/env';
@@ -7,10 +7,10 @@ import * as path from 'path';
 import * as hbs from 'handlebars';
 import * as dotenv from 'dotenv';
 import { User } from './entitys/user.entity';
-import { CorreoDto } from './dto/correo.dto';
-import { CorreoMasivoDto } from './dto/correoMasivo.dto';
 import { UnicoMailDto } from 'src/bus/dto/unicoMail.dto';
 import { MasivoMailDto } from 'src/bus/dto/masivoMail.dto';
+import { NotificacionDto } from './dto/notificacion.dto';
+import { TemplateEnum } from './enums/template.enum';
 
 dotenv.config();
 
@@ -28,41 +28,74 @@ export class AlertaService {
 
   //Endpoint
 
-  async findByUser(userId: string) {
-    const res = await this.prisma.notification.findMany({
-      where: { userId },
-      orderBy: { fechaCreacion: 'desc' },
-    });
+  async findByUser(userId: string): Promise<NotificacionDto[]> {
+    try {
+      const res = await this.prisma.notification.findMany({
+        where: { userId },
+        orderBy: { fechaCreacion: 'desc' },
+      });
 
-    return res.map(r => ({ ...r, id: String(r.id) }));
+      return res.map(n => ({
+        id: n.id,
+        asunto: n.asunto,
+        resumen: n.resumen,
+        visto: n.visto,
+        fechaCreacion: n.fechaCreacion,
+      }));
+    } catch (err) {
+      this.logger.error(`Error obteniendo notificaciones para usuario ${userId}:`, err);
+      throw new HttpException('Error al obtener notificaciones', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
   async countUnread(userId: string) {
-    return this.prisma.notification.count({
-      where: { userId, visto: false },
-    });
+    try {
+      return await this.prisma.notification.count({ where: { userId, visto: false } });
+    } catch (err) {
+      this.logger.error(`Error contando notificaciones no leídas para usuario ${userId}:`, err);
+      throw new HttpException('Error al contar notificaciones no leídas', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
   async deleteById(id: string) {
-    const res = await this.prisma.notification.delete({
-      where: { id: Number(id) },
-    });
-    if (!res) throw new NotFoundException('Notificación no encontrada');
+    try {
+      await this.prisma.notification.delete({ where: { id: Number(id) } });
+    } catch (err: any) {
+      this.logger.error(`Error eliminando notificación ${id}:`, err);
+      if (err?.code === 'P2025' || /not found/i.test(err.message || '')) {
+        throw new NotFoundException('Notificación no encontrada');
+      }
+      throw new HttpException('Error al eliminar notificación', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
   async markAllRead(userId: string) {
-    await this.prisma.notification.updateMany({
-      where: { userId, visto: false },
-      data: { visto: true },
-    });
+    try {
+      const res = await this.prisma.notification.updateMany({
+        where: { userId, visto: false },
+        data: { visto: true },
+      });
+      return res.count;
+    } catch (err) {
+      this.logger.error(`Error marcando como leídas las notificaciones de ${userId}:`, err);
+      throw new HttpException('Error al marcar notificaciones como leídas', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
   async markRead(id: string) {
-    const res = await this.prisma.notification.update({
-      where: { id: Number(id) },
-      data: { visto: true },
-    });
-    if (!res) throw new NotFoundException('Notificación no encontrada');
+    try {
+      const res = await this.prisma.notification.update({
+        where: { id: Number(id) },
+        data: { visto: true },
+      });
+      return res;
+    } catch (err: any) {
+      this.logger.error(`Error marcando notificación ${id} como leída:`, err);
+      if (err?.code === 'P2025' || /not found/i.test(err.message || '')) {
+        throw new NotFoundException('Notificación no encontrada');
+      }
+      throw new HttpException('Error al marcar notificación como leída', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
   //Crear notificaciones
@@ -88,7 +121,8 @@ export class AlertaService {
   /** Crear notificación para un receptor */
   async registrarCorreoEnviado(informacion: UnicoMailDto) {
     const user = await this.getUsuarioPorEmail(informacion.email);
-    await this.crearNotificacionEnBD(user.id, informacion.template, informacion.resumen);
+    const subject = (TemplateEnum as any)[informacion.template] ?? informacion.template;
+    await this.crearNotificacionEnBD(user.id, subject, informacion.resumen);
   }
 
   /** Crear notificaciones para varios receptores */
@@ -118,12 +152,12 @@ export class AlertaService {
   }
 
   /** Enviar correo con plantilla */
-  async enviarCorreoIndividual(correo: CorreoDto ) {
+  async enviarCorreoIndividual(correo: UnicoMailDto ) {
     const source = this.loadTemplate(correo.template);
     const compiled = hbs.compile(source);
-    const html = compiled({...correo, year: new Date().getFullYear()});
+    const html = compiled({...correo});
 
-    const logoPath = path.join(process.cwd(), 'doc', 'imgs', 'logo.svg');
+    const logoPath = path.join(process.cwd(), 'doc', 'imgs', 'logo.png');
     const attachments: any[] = [];
 
     if (fs.existsSync(logoPath)) {
@@ -144,10 +178,12 @@ export class AlertaService {
       this.logger.debug(`Logo no encontrado en ${logoPath}, se enviará plantilla sin inline logo.`);
     }
 
+    const subject = (TemplateEnum as any)[correo.template] ?? `ECIWISE - ${correo.template}`;
+
     const msg: any = {
       to: correo.email,
       from: { email: envs.mailfrom, name: 'Eciwise Alerts' },
-      subject: `ECIWISE - ${correo.template}`,
+      subject,
       html,
     };
 
@@ -162,12 +198,14 @@ export class AlertaService {
     }
   }
 
-  async enviarCorreoMasivos(info : CorreoMasivoDto){
+  async enviarCorreoMasivos(info : MasivoMailDto){
     for(const receptor of info.receptores){
-      const correo: CorreoDto = {
+      const correo: UnicoMailDto = {
         email: receptor.email,
         name: receptor.name,
         template: info.template,
+        resumen: info.resumen,        
+        guardar: info.guardar,
       };
       await this.enviarCorreoIndividual(correo);
     }

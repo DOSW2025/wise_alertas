@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body { margin:0; padding:0; background:#f4f4f7; font-family:Arial, sans-serif; }
+    .container { max-width:600px; margin:auto; background:#fff; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.1); overflow:hidden; }
+    .header { background:#8C0000; color:#fff; padding:24px; text-align:center; }
+    .header img { max-width:50px; margin-bottom:10px; }
+    .content { padding:24px; color:#333; font-size:16px;}
+    .button { display:inline-block; padding:12px 24px; background:#990000; color:#fff; text-decoration:none; border-radius:6px; font-weight:bold; margin-top:20px; }
+    .footer { text-align:center; padding:20px; color:#777; font-size:13px;}
+    .info-box {
+      
+      background: #ffecec;
+      border-left: 5px solid #cc0000;
+      padding: 16px;
+      margin: 20px 0;
+      border-radius: 6px;
+      color: #660000;
+      font-size: 15px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+      <img src="cid:logo" alt="Logo" />
+      <h2>Tutoría Rechazada</h2>
+    </div>
+
+    <div class="content">
+      <p>Hola <strong>{{name}}</strong>,</p>
+
+      <p>Lamentamos informarte que tu solicitud de tutoría ha sido <strong>rechazada</strong>.</p>
+
+        
+      <div class="info-box">
+        <strong>📘 Detalles de tu solicitud:</strong>
+        <p style="margin: 8px 0 0;">
+          • Materia: <strong>{{materia}}</strong><br>
+          • Fecha solicitada: <strong>{{fecha}}</strong><br>
+          • Hora : <strong>{{hora}}</strong><br>
+          • Tutor seleccionado: <strong>{{tutor}}</strong><br>
+          • Modalidad seleccionada: <strong>{{modalidad}}</strong><br>
+          • Motivo: <strong>{{razon}}</strong>
+        </p>
+      </div>
+      <p>Puedes intentar solicitar una nueva tutoría con otro tutor disponible.</p>
+        
+      <div style="text-align:center;">
+        <a href="{{dashboardLink}}" class="button">Buscar otro tutor</a>
+      </div>
+
+      <p style="margin-top:24px; color:#999; font-size:14px;">Este es un correo automático. No respondas a este mensaje.</p>
+    </div>
+
+    <div class="footer">
+      © {{year}} ECIWISE — Todos los derechos reservados.
+    </div>
+  </div>
+</body>
+</html>
