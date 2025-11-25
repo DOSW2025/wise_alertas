@@ -7,9 +7,11 @@ import { RolMailDto } from './dto/rolMail.dto';
 import { UnicoMailDto } from './dto/unicoMail.dto';
 import { User } from 'src/alerta/entitys/user.entity';
 
+/** Servicio encargado de enviar correos a todos los usuarios que tengan un rol específico */
 @Injectable()
 export class MailEnvioRol extends BaseBusService {
-
+  
+  /** Recibe AlertaService y PrismaService para poder enviar correos y consultar usuarios */
   constructor(protected readonly alertaService: AlertaService,private prisma: PrismaService) {
       super(alertaService);
 
@@ -27,6 +29,12 @@ export class MailEnvioRol extends BaseBusService {
     return 'Notification Service Bus';
   }
 
+  /**
+   * Procesa el mensaje recibido:
+   * Obtiene usuarios asociados al rol
+   * Construye un correo individual por usuario
+   * Envía y/o guarda notificación según los flags
+   */
   protected async processMessage(message: any): Promise<void> {
     const messageContent: RolMailDto = this.extractMessageContent(message);
 

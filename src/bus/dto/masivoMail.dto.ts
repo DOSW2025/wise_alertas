@@ -15,24 +15,33 @@ import { ApiProperty } from '@nestjs/swagger';
  * }
  */
 export class MasivoMailDto {
+
+    /** Lista de receptores del correo */
     @IsArray()
     @ValidateNested({ each: true })
     @Type(() => ReceptorDto)
     @ApiProperty({ type: () => ReceptorDto, isArray: true })
     receptores!: ReceptorDto[];
 
+    
+    /** Nombre de la plantilla a usar */
     @IsString()
     @ApiProperty({ example: 'nuevoMaterialSubido' })
     template!: string;
 
+    
+    /** Texto corto que se guarda como resumen en BD */
     @IsString()
     @ApiProperty({ required: false, example: 'Resumen del correo' })
     resumen!: string;
 
+    
+    /** Indica si debe guardarse una notificación en la BD */
     @IsBoolean()
     @ApiProperty({ required: false, example: true })
     guardar!: boolean;
     
+    /** Flag opcional para decidir si se envía o no el correo */
     @IsOptional()
     @IsBoolean()
     @Type(() => Boolean)

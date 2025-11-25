@@ -3,7 +3,9 @@ import { MailEnvioRol } from './mailEnvioRol.service';
 import { AlertaService } from '../alerta/alerta.service';
 import { PrismaService } from '../prisma/prisma.service';
 
-// Mock de envs para que no falle la validación de config/env.ts
+/**
+ * Pruebas unitarias para el servicio MailEnvioMasivo
+ */
 jest.mock('../config/env', () => ({
   envs: {
     mailenviorolconnectionstring: 'Endpoint=sb://fake-connection-string/',
