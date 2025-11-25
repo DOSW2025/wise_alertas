@@ -1,3 +1,6 @@
+/**
+ * Pruebas unitarias para AlertaService.
+ */
 jest.mock('../../generated/prisma', () => {
   class PrismaClient {
     $connect = jest.fn();

@@ -1,3 +1,6 @@
+/**
+ * Pruebas unitarias para la configuración de entorno
+ */
 import * as path from 'path';
 
 describe('config/env.ts', () => {
@@ -5,12 +8,12 @@ describe('config/env.ts', () => {
   const ORIGINAL_ENV = process.env;
 
   beforeEach(() => {
-    jest.resetModules(); // limpia cache
-    process.env = { ...ORIGINAL_ENV }; // clonar env original
+    jest.resetModules(); 
+    process.env = { ...ORIGINAL_ENV }; 
   });
 
   afterAll(() => {
-    process.env = ORIGINAL_ENV; // restaurar env global
+    process.env = ORIGINAL_ENV; 
   });
 
   const loadEnv = () => require('./env'); 

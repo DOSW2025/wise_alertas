@@ -1,3 +1,7 @@
+/**
+ * Pruebas para verificar el comportamiento del controlador de alertas.
+ */
+
 jest.mock('../config/env', () => ({
   envs: {
     port: 3000,

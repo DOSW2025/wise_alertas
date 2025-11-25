@@ -5,9 +5,15 @@ import { AlertaService } from '../alerta/alerta.service';
 import { envs } from '../config/env';
 import { MasivoMailDto } from './dto/masivoMail.dto';
 
+/**
+ * Servicio que procesa mensajes del bus para envío masivo de correos.
+ */
 @Injectable()
 export class MailEnvioMasivo extends BaseBusService {
 
+    /**
+   * Recibe el servicio de alertas y lo pasa a la clase base del bus.
+   */
   constructor(protected readonly alertaService: AlertaService) {
     super(alertaService);
   }
@@ -24,6 +30,12 @@ export class MailEnvioMasivo extends BaseBusService {
     return 'Chat Service Bus';
   }
 
+  /**
+   * Procesa el mensaje recibido desde la cola:
+   * Valida el contenido
+   * Envía correos masivos según la bandera mandarCorreo
+   * Registra notificaciones si guardar es true
+   */
   protected async processMessage(message: any): Promise<void> {
     const messageContent : MasivoMailDto = this.extractMessageContent(message);
     

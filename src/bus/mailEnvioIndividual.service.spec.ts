@@ -1,3 +1,6 @@
+/**
+ * Pruebas unitarias para el servicio MailEnvioIndividual
+ */
 jest.mock('../config/env', () => ({
   envs: {
     mailenvioindividualconnectionstring: 'FAKE_CONN',

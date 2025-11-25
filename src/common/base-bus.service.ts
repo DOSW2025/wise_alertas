@@ -2,6 +2,7 @@ import {Injectable,OnModuleInit,OnModuleDestroy,Logger,} from '@nestjs/common';
 import {ServiceBusClient,ServiceBusReceiver,ServiceBusReceivedMessage,} from '@azure/service-bus';
 import { AlertaService } from '../alerta/alerta.service';
 
+/** Clase base para servicios que consumen mensajes desde Service Bus */
 @Injectable()
 export abstract class BaseBusService implements OnModuleInit, OnModuleDestroy{
   protected client: ServiceBusClient;

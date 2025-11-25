@@ -1,3 +1,6 @@
+/**
+ * Pruebas unitarias para el servicio BaseBusService
+ */
 jest.mock('../config/env', () => ({
   envs: {
     port: 3000,

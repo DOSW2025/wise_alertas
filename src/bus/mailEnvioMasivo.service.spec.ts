@@ -1,9 +1,11 @@
+/**
+ * Pruebas unitarias para el servicio MailEnvioMasivo
+ */
 jest.mock('../config/env', () => ({
   envs: {
     mailenviomasivoconnectionstring: 'FAKE_MASIVO_CONN',
   },
 }));
-
 
 jest.mock('../common/base-bus.service', () => {
   class BaseBusService {
