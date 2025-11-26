@@ -9,12 +9,18 @@ export class ReceptorDto {
   /** Correo electrónico del receptor */
   @IsEmail()
   @IsNotEmpty()
-  @ApiProperty({ example: 'user@example.com' })
+  @ApiProperty({
+    example: 'usuario@example.com',
+    description: 'Correo electrónico válido del destinatario.'
+  })
   email!: string;
 
   /** Nombre del receptor */
   @IsString()
   @IsNotEmpty()
-  @ApiProperty({ example: 'Jared' })
+  @ApiProperty({
+    example: 'Juan Pérez',
+    description: 'Nombre del destinatario que aparecerá en el correo.'
+  })
   name!: string;
 }
