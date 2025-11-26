@@ -9,53 +9,89 @@ export class UnicoMailDto {
 
     /** Correo del destinatario */
     @IsString()
-    @ApiProperty({ example: 'user@example.com', required: true })
+    @ApiProperty({
+        example: 'user@example.com',
+        required: true,
+        description: 'Correo electrónico del usuario que recibirá el mensaje.'
+    })
     email!: string;
 
     /** Nombre del destinatario */
     @IsString()
-    @ApiProperty({ example: 'Carlos Gómez', required: true })
+    @ApiProperty({
+        example: 'Carlos Gómez',
+        required: true,
+        description: 'Nombre del usuario que recibirá el mensaje.'
+    })
     name!: string;
 
     /** Nombre interno de la plantilla */
     @IsString()
-    @ApiProperty({ example: 'nuevoMaterialSubido', required: true })
+    @ApiProperty({
+        example: 'nuevoMaterialSubido',
+        required: true,
+        description: 'Plantilla utilizada para generar el correo.'
+    })
     template!: string;
 
     /** Breve resumen del contenido del correo */
     @IsString()
-    @ApiProperty({ required: true, example: 'Resumen del correo' })
+    @ApiProperty({
+        required: true,
+        example: 'Resumen del correo',
+        description: 'Texto corto que resume el contenido del correo.'
+    })
     resumen!: string;
 
     /** Define si la notificación debe guardarse en BD */
     @IsBoolean()
-    @ApiProperty({ required: true, example: true })
+    @ApiProperty({
+        required: true,
+        example: true,
+        description: 'Indica si debe registrarse una notificación en la Base de Datos.'
+    })
     guardar!: boolean;
     
     /** Indica si realmente debe enviarse el correo */
     @IsOptional()
     @IsBoolean()
     @Type(() => Boolean)
-    @ApiProperty({ required: false, example: true })
+    @ApiProperty({
+        required: false,
+        example: true,
+        description: 'Si es true, se envía el correo. Si es false, solo se guarda la notificación.'
+    })
     mandarCorreo?: boolean = true;
 
     /** Año referencial usado en algunas plantillas */
     @IsOptional()
     @IsNumber()
     @Type(() => Number)
-    @ApiProperty({ required: false, example: 2025 })
+    @ApiProperty({
+        required: false,
+        example: 2025,
+        description: 'Año utilizado por ciertas plantillas como dato adicional.'
+    })
     year?: number = new Date().getFullYear();
 
     /** Rol anterior del usuario (si aplica) */
     @IsString()
     @IsOptional()
-    @ApiProperty({ required: false, example: 'apellido' })
+    @ApiProperty({
+        required: false,
+        example: 'estudiante',
+        description: 'Rol anterior del usuario cuando aplica un cambio de rol.'
+    })
     oldRole?: string;
 
     /** Nuevo rol del usuario (si aplica) */
     @IsString()
     @IsOptional()
-    @ApiProperty({ required: false, example: 'nuevoRol' })
+    @ApiProperty({
+        required: false,
+        example: 'tutor',
+        description: 'Nuevo rol asignado al usuario.'
+    })
     newRole?: string;
 
     /** Materia relacionada (cuando la plantilla lo requiere) */

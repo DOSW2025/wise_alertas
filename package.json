@@ -73,13 +73,19 @@
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },
+    "collectCoverage": true,
     "collectCoverageFrom": [
       "**/*.service.ts",
       "**/*.controller.ts",
       "common/base-bus.service.ts",
       "!prisma/prisma.service.ts"
     ],
-      "coverageDirectory": "../coverage",
+    "coverageDirectory": "../coverage",
+    "coverageReporters": [
+    "html",
+    "text",
+    "lcov"
+  ],
     "testEnvironment": "node"
   }
 }
