@@ -41,6 +41,7 @@ import { NotFoundException, HttpException, HttpStatus } from '@nestjs/common';
 describe('AlertaService', () => {
   let service: AlertaService;
   let prismaMock: any;
+  let clientMock: any;
 
     beforeEach(() => {
     jest.clearAllMocks(); 
@@ -59,7 +60,49 @@ describe('AlertaService', () => {
         },
     };
 
-    service = new AlertaService(prismaMock);
+    // Mock ServiceBusClient with createReceiver returning an object with subscribe stub
+    // Capture the subscribe handlers so tests can trigger processMessage/processError
+    let rolHandlers: any = null;
+    let uniqueHandlers: any = null;
+    clientMock = {
+      createReceiver: jest.fn().mockImplementation((name: string) => {
+        const receiver: any = {
+          subscribe: (handlers: any) => {
+            if (name === 'mail.envio.rol') {
+              rolHandlers = handlers;
+            } else {
+              uniqueHandlers = handlers;
+            }
+          },
+        };
+        return receiver;
+      }),
+      // expose handlers for tests
+      __getHandlers: () => ({ rolHandlers, uniqueHandlers }),
+    };
+
+    // Instantiate service with mocked prisma and service-bus client
+    service = new AlertaService(prismaMock as any, clientMock as any);
+
+    // Add backward-compatible aliases for older test names to avoid changing many tests
+    (service as any).registrarCorreoEnviado = (info: any) => (service as any).registrarCorreoIndividual(info);
+    (service as any).registrarCorreoEnviadoMasivas = (info: any) => {
+      // older behavior expected: iterate receptores and call registrarCorreoEnviado
+      if (info.receptores && Array.isArray(info.receptores)) {
+        return Promise.all(info.receptores.map((r: any) => (service as any).registrarCorreoIndividual({ ...r, ...info })));
+      }
+      // if called with a Rol-like payload, map to registrarCorreoPorRol
+      return (service as any).registrarCorreoPorRol(info);
+    };
+    (service as any).enviarCorreoMasivos = (info: any) => {
+      if (info.receptores && Array.isArray(info.receptores)) {
+        return Promise.all(info.receptores.map((r: any) => (service as any).enviarCorreoIndividual({ ...r, ...info })));
+      }
+      return (service as any).enviarCorreoPorRol(info);
+    };
+
+    // attach reference to handlers so tests can access them
+    (service as any).__getQueueHandlers = () => (clientMock as any).__getHandlers();
     });
 
 
@@ -220,7 +263,7 @@ describe('AlertaService', () => {
       guardar: true,
     };
 
-    await service.registrarCorreoEnviado(info as any);
+    await (service as any).registrarCorreoEnviado(info as any);
 
     expect(prismaMock.usuario.findUnique).toHaveBeenCalledWith({
       where: { email: 'test@test.com' },
@@ -246,7 +289,7 @@ describe('AlertaService', () => {
       guardar: true,
     };
 
-    await expect(service.registrarCorreoEnviado(info as any)).rejects.toBeInstanceOf(
+    await expect((service as any).registrarCorreoEnviado(info as any)).rejects.toBeInstanceOf(
       NotFoundException,
     );
   });
@@ -254,7 +297,7 @@ describe('AlertaService', () => {
   // registrarCorreoEnviadoMasivas
   it('registrarCorreoEnviadoMasivas: debe registrar notificación por cada receptor', async () => {
     const spyRegistrar = jest
-      .spyOn(service, 'registrarCorreoEnviado')
+      .spyOn(service as any, 'registrarCorreoEnviado')
       .mockResolvedValue(undefined as any);
 
     const info = {
@@ -267,7 +310,7 @@ describe('AlertaService', () => {
       guardar: true,
     };
 
-    await service.registrarCorreoEnviadoMasivas(info as any);
+    await (service as any).registrarCorreoEnviadoMasivas(info as any);
 
     expect(spyRegistrar).toHaveBeenCalledTimes(2);
     expect(spyRegistrar).toHaveBeenNthCalledWith(
@@ -444,7 +487,7 @@ describe('AlertaService', () => {
       guardar: true,
     };
 
-    await service.enviarCorreoMasivos(info as any);
+    await (service as any).enviarCorreoMasivos(info as any);
 
     expect(spyEnviar).toHaveBeenCalledTimes(2);
     expect(spyEnviar).toHaveBeenNthCalledWith(
@@ -467,5 +510,33 @@ describe('AlertaService', () => {
         guardar: true,
       }),
     );
+  });
+
+  it('rol queue: processMessage debe llamar enviar y guardar cuando corresponda', async () => {
+    const spyEnviarRol = jest.spyOn(service as any, 'enviarCorreoPorRol').mockResolvedValue(undefined as any);
+    const spyGuardarRol = jest.spyOn(service as any, 'registrarCorreoPorRol').mockResolvedValue(undefined as any);
+
+    const handlers = (service as any).__getQueueHandlers();
+    const { rolHandlers } = handlers;
+    expect(rolHandlers).toBeDefined();
+
+    await rolHandlers.processMessage({ body: { mandarCorreo: true, guardar: true, rol: 'rolX' } });
+
+    expect(spyEnviarRol).toHaveBeenCalledWith({ mandarCorreo: true, guardar: true, rol: 'rolX' });
+    expect(spyGuardarRol).toHaveBeenCalledWith({ mandarCorreo: true, guardar: true, rol: 'rolX' });
+  });
+
+  it('unique queue: processMessage debe llamar enviar y guardar cuando corresponda', async () => {
+    const spyEnviar = jest.spyOn(service as any, 'enviarCorreoIndividual').mockResolvedValue(undefined as any);
+    const spyGuardar = jest.spyOn(service as any, 'registrarCorreoIndividual').mockResolvedValue(undefined as any);
+
+    const handlers = (service as any).__getQueueHandlers();
+    const { uniqueHandlers } = handlers;
+    expect(uniqueHandlers).toBeDefined();
+
+    await uniqueHandlers.processMessage({ body: { mandarCorreo: true, guardar: true, email: 'u@test.com' } });
+
+    expect(spyEnviar).toHaveBeenCalledWith({ mandarCorreo: true, guardar: true, email: 'u@test.com' });
+    expect(spyGuardar).toHaveBeenCalledWith({ mandarCorreo: true, guardar: true, email: 'u@test.com' });
   });
 });

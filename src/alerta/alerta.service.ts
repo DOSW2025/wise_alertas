@@ -29,7 +29,7 @@ export class AlertaService {
     this.sgMail = new SendGridMailService();
     this.sgMail.setApiKey(envs.sendgridapikey);
     this.rolQueue = this.client.createReceiver('mail.envio.rol');
-    this.uniqueQueue = this.client.createReceiver('mail.envio.unico');
+    this.uniqueQueue = this.client.createReceiver('mail.envio.individual');
     this.listenForUniqueQueue();
     this.listenForRolQueue();
   }
