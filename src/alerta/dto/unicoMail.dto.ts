@@ -74,6 +74,35 @@ export class UnicoMailDto {
     })
     year?: number = new Date().getFullYear();
 
+    //opcionales
+
+    /** Tema del material */
+    @IsString()
+    @ApiProperty({
+        required: false,
+        example: 'Programación Básica',
+        description: 'Tema del material relacionado con el correo.'
+    })
+    material_topic?: string;
+
+    /** Autor del material */
+    @IsString()
+    @ApiProperty({
+        required: false,
+        example: 'Juan Pérez',
+        description: 'Autor del material relacionado con el correo.'
+    })
+    material_author?: string;
+
+    /** Enlace al material */
+    @IsString()
+    @ApiProperty({
+        required: false,
+        example: 'https://example.com/material',
+        description: 'Enlace al material relacionado con el correo.'
+    })
+    link?: string;
+
     /** Rol anterior del usuario (si aplica) */
     @IsString()
     @IsOptional()

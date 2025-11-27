@@ -52,4 +52,51 @@ export class RolMailDto {
     })
     mandarCorreo?: boolean = true;
 
+    /** Nombre del material */
+    @IsString()
+    @ApiProperty({
+        required: false,
+        example: 'Introducción a la Programación',
+        description: 'Nombre del material relacionado con el correo.'
+    })
+    material_name?: string;
+
+    /** Asunto del material */
+    @IsString()
+    @ApiProperty({
+        required: false,
+        example: 'Fundamentos de Programación',
+        description: 'Asunto del material relacionado con el correo.'
+    })
+    material_subject?: string;
+
+    //opcionales
+
+    /** Tema del material */
+    @IsString()
+    @ApiProperty({
+        required: false,
+        example: 'Programación Básica',
+        description: 'Tema del material relacionado con el correo.'
+    })
+    material_topic?: string;
+
+    /** Autor del material */
+    @IsString()
+    @ApiProperty({
+        required: false,
+        example: 'Juan Pérez',
+        description: 'Autor del material relacionado con el correo.'
+    })
+    material_author?: string;
+
+    /** Enlace al material */
+    @IsString()
+    @ApiProperty({
+        required: false,
+        example: 'https://example.com/material',
+        description: 'Enlace al material relacionado con el correo.'
+    })
+    link?: string;
+
 }

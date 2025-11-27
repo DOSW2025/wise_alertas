@@ -7,35 +7,35 @@ import * as path from 'path';
 import * as hbs from 'handlebars';
 import * as dotenv from 'dotenv';
 import { User } from './entitys/user.entity';
-import { UnicoMailDto } from 'src/bus/dto/unicoMail.dto';
+import { UnicoMailDto } from 'src/alerta/dto/unicoMail.dto';
 import { NotificacionDto } from './dto/notificacion.dto';
 import { TemplateEnum } from './enums/template.enum';
+import { ServiceBusClient} from '@azure/service-bus';
+import { RolMailDto } from './dto/rolMail.dto';
+
 
 dotenv.config();
 
 @Injectable()
 export class AlertaService {
-  /** Logger interno del servicio */
   private readonly logger = new Logger(AlertaService.name);
-  
-  /** Cliente de SendGrid para envío de correos */
   private readonly sgMail: SendGridMailService;
+  private rolQueue;
+  private uniqueQueue; 
 
-  /** Directorio base donde se encuentran las plantillas .hbs */
   private templatesDir = path.join(process.cwd(), 'src', 'templates');
 
-  constructor(private prisma: PrismaService) {
+  constructor(private prisma: PrismaService,private readonly client: ServiceBusClient) {
     this.sgMail = new SendGridMailService();
     this.sgMail.setApiKey(envs.sendgridapikey);
+    this.rolQueue = this.client.createReceiver('mail.envio.rol');
+    this.uniqueQueue = this.client.createReceiver('mail.envio.unico');
+    this.listenForUniqueQueue();
+    this.listenForRolQueue();
   }
 
-  //Endpoint
+  //Endpoints
 
-  /**
-   * Obtiene todas las notificaciones de un usuario.
-   * @param userId ID del usuario propietario de las notificaciones.
-   * @returns Lista de notificaciones ordenadas por fecha de creación.
-   */
   async findByUser(userId: string): Promise<NotificacionDto[]> {
     try {
       const res = await this.prisma.notification.findMany({
@@ -56,11 +56,6 @@ export class AlertaService {
     }
   }
 
-  /**
-   * Obtiene la cantidad de notificaciones no leídas.
-   * @param userId ID del usuario.
-   * @returns Número de notificaciones sin abrir.
-   */
   async countUnread(userId: string) {
     try {
       return await this.prisma.notification.count({ where: { userId, visto: false } });
@@ -70,10 +65,6 @@ export class AlertaService {
     }
   }
 
-  /**
-   * Elimina una notificación por su ID.
-   * @param id Identificador de la notificación.
-   */
   async deleteById(id: string) {
     try {
       await this.prisma.notification.delete({ where: { id: Number(id) } });
@@ -86,11 +77,6 @@ export class AlertaService {
     }
   }
 
-  /**
-   * Marca todas las notificaciones de un usuario como leídas.
-   * @param userId ID del usuario.
-   * @returns Cantidad de notificaciones actualizadas.
-   */
   async markAllRead(userId: string) {
     try {
       const res = await this.prisma.notification.updateMany({
@@ -104,11 +90,6 @@ export class AlertaService {
     }
   }
 
-  /**
-   * Marca una notificación como leída.
-   * @param id ID de la notificación.
-   * @returns Notificación actualizada.
-   */
   async markRead(id: string) {
     try {
       const res = await this.prisma.notification.update({
@@ -127,12 +108,7 @@ export class AlertaService {
 
   //Crear notificaciones
 
-  /**
-   * Crea una notificación en la base de datos.
-   * @param userId ID del usuario.
-   * @param titulo Título/asunto de la notificación.
-   * @param mensaje Resumen o contenido breve.
-   */
+  /** Crear notificación en BD */
   private async crearNotificacionEnBD(userId: string, titulo: string, mensaje: string) {
     await this.prisma.notification.create({
       data: {
@@ -143,57 +119,34 @@ export class AlertaService {
     });
   }
 
-  /**
-   * Busca un usuario por su correo electrónico.
-   * @param mail Correo del usuario.
-   * @throws NotFoundException si no existe.
-   */
+  /** Buscar usuario por email */
   private async getUsuarioPorEmail(mail: string): Promise<User> {
     const user = await this.prisma.usuario.findUnique({ where: { email: mail } });
     if (!user) throw new NotFoundException('Usuario no encontrado');
     return user;
   }
-  
-  /**
-   * Registra una notificación para un único receptor.
-   * @param informacion DTO con datos del correo.
-   */
-  async registrarCorreoEnviado(informacion: UnicoMailDto) {
+
+  /** Crear notificación para un receptor */
+  async registrarCorreoIndividual(informacion: UnicoMailDto) {
     const user = await this.getUsuarioPorEmail(informacion.email);
     const subject = (TemplateEnum as any)[informacion.template] ?? informacion.template;
     await this.crearNotificacionEnBD(user.id, subject, informacion.resumen);
   }
 
-<<<<<<< HEAD
   /** Crear notificaciones para varios receptores */
-  async registrarCorreoEnviadoMasivas(informacion: any) {
-=======
-  /**
-   * Registra notificaciones para múltiples receptores.
-   * @param informacion DTO de envío masivo.
-   */
-  async registrarCorreoEnviadoMasivas(informacion: MasivoMailDto) {
->>>>>>> 7bed035bb16b55cf26ce05953371ea39b930e9dc
-    for (const receptor of informacion.receptores) {
+  async registrarCorreoPorRol(informacion: RolMailDto) {
+    const users = await this.encontrarUsuariosPorRol(informacion.rol);
+    for (const user of users) {
         const notificacion: UnicoMailDto = {
-            email: receptor.email,
-            name: receptor.name,
-            template: informacion.template,
-            resumen: informacion.resumen,
-            guardar: informacion.guardar,
+        email: user.email,
+        name: `${user.nombre} ${user.apellido}`,...informacion,
       };
-      await this.registrarCorreoEnviado(notificacion);
+      await this.registrarCorreoIndividual(notificacion);
     }
   }
 
   //CORREOS
 
-  /**
-   * Carga una plantilla Handlebars desde disco.
-   * Si no existe, usa una plantilla por defecto.
-   * @param templateName Nombre base del archivo .hbs.
-   * @returns Contenido de la plantilla.
-   */
   private loadTemplate(templateName: string): string {
     const filePath = path.join(this.templatesDir, `${templateName}.hbs`);
 
@@ -204,12 +157,7 @@ export class AlertaService {
     return fs.readFileSync(filePath, 'utf8');
   }
 
-  /**
-   * Envía un correo individual usando una plantilla Handlebars.
-   * Adjunta un logo si está disponible.
-   * @param correo DTO con datos del correo.
-   * @throws Error si SendGrid falla.
-   */
+  /** Enviar correo con plantilla */
   async enviarCorreoIndividual(correo: UnicoMailDto ) {
     const source = this.loadTemplate(correo.template);
     const compiled = hbs.compile(source);
@@ -240,7 +188,7 @@ export class AlertaService {
 
     const msg: any = {
       to: correo.email,
-      from: { email: envs.mailfrom, name: 'Eciwise' },
+      from: { email: envs.mailfrom, name: 'Eciwise Alerts' },
       subject,
       html,
     };
@@ -256,25 +204,75 @@ export class AlertaService {
     }
   }
 
-<<<<<<< HEAD
-  async enviarCorreoMasivos(info : any){
-=======
-  /**
-   * Envío masivo de correos utilizando la lógica de envío individual.
-   * @param info DTO con receptores y plantilla.
-   */
-  async enviarCorreoMasivos(info : MasivoMailDto){
->>>>>>> 7bed035bb16b55cf26ce05953371ea39b930e9dc
-    for(const receptor of info.receptores){
+  private async encontrarUsuariosPorRol(rol: string): Promise<User[]> {
+    const usuarios : User[] = await this.prisma.usuario.findMany({
+      where: {
+        rol: { nombre: rol },
+      },
+      select: {
+        id: true,
+        email: true,
+        nombre: true,
+        apellido: true,
+      },
+    });
+    return usuarios;
+  }
+
+  async enviarCorreoPorRol(info : RolMailDto){
+    const usuarios  = await this.encontrarUsuariosPorRol(info.rol);
+    for(const usuario of usuarios){
       const correo: UnicoMailDto = {
-        email: receptor.email,
-        name: receptor.name,
-        template: info.template,
-        resumen: info.resumen,        
-        guardar: info.guardar,
+        email: usuario.email,
+        name: `${usuario.nombre} ${usuario.apellido}`,...info,
       };
       await this.enviarCorreoIndividual(correo);
     }
+  }
+
+  //metodos para escuchar las colas
+
+
+  /**
+   * Escuchar la cola de roles para procesar mensajes
+   */
+  private listenForRolQueue() {
+    this.rolQueue.subscribe({
+      processMessage: async (message) => {
+        if (message.body.mandarCorreo) {
+          await this.enviarCorreoPorRol(message.body as RolMailDto);
+        }
+        if (message.body.guardar) {
+          await this.registrarCorreoPorRol(message.body as RolMailDto);
+        }
+        this.logger.log(`Mensaje procesado en rolQueue: ${message.body}`);
+      },
+      processError: async (err) => { 
+        this.logger.error('Error en rolQueue: ', err); 
+      }, 
+    });
+  }
+
+  /** Escuchar la cola de únicos para procesar mensajes
+   */
+  private listenForUniqueQueue() {
+    
+    this.uniqueQueue.subscribe({
+      processMessage: async (message) => {
+        if (message.body.mandarCorreo) {
+          await this.enviarCorreoIndividual(message.body as UnicoMailDto);
+        }
+        if (message.body.guardar) {
+          await this.registrarCorreoIndividual(message.body as UnicoMailDto);
+        }
+
+
+        this.logger.log(`Mensaje procesado en uniqueQueue: ${message.body}`);
+      },
+      processError: async (err) => { 
+        this.logger.error('Error en uniqueQueue: ', err); 
+      }, 
+    }); 
   }
 
 }
