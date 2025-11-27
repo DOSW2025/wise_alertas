@@ -1,3 +1,7 @@
+/**
+ * Agrupa todas las plantillas de correo usadas por el sistema.
+ * Cada valor representa el asunto del correo para un evento específico.
+ */
 export enum TemplateEnum {
 
     //Autenticación
@@ -16,5 +20,6 @@ export enum TemplateEnum {
     CompletacionTutoriaEstudiante ='Su tutoría ha sido completada',
     CompletacionTutoriaTutor ='Se ha completado una tutoría',
     //Materales
+    nuevoMaterialSubido = 'Se ha subido un nuevo material',
 
 }

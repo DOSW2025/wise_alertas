@@ -4,7 +4,6 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
   <style>
     body {
       margin: 0;
@@ -36,6 +35,7 @@
       font-size: 16px;
       line-height: 1.6;
     }
+
     .info-box {
       background: #f0f6ff;
       border-left: 5px solid #0066cc;
@@ -66,44 +66,44 @@
 <body>
   <div class="container">
 
+    <!-- HEADER -->
     <div class="header">
       <img src="cid:logo" alt="ECIWISE Logo" />
-      <h2>Nueva Solicitud de Tutoría</h2>
+      <h2>Nuevo material disponible</h2>
     </div>
 
+    <!-- CONTENT -->
     <div class="content">
+
       <p>Hola <strong>{{name}}</strong>,</p>
 
-      <p>
-        Has recibido una nueva solicitud de monitoría de <strong>{{tutor}}</strong>.
-      </p>
+      <p>Se ha subido un nuevo material que podría ser útil para tu proceso académico.</p>
 
+      <!-- INFO BOX -->
       <div class="info-box">
-        <strong>📘 Detalles de la solicitud:</strong>
-        <p style="margin: 8px 0 0;">
-          • Materia: <strong>{{materia}}</strong><br>
-          • Fecha solicitada: <strong>{{fecha}}</strong><br>
-          • Hora : <strong>{{hora}}</strong><br>
-          • Mensaje del estudiante: <em>{{mensaje}}</em>
-        </p>
+        <p><strong>📘 Nombre del material:</strong> {{material_name}}</p>
+        <p><strong>📚 Materia:</strong> {{material_subject}}</p>
+        <p><strong>📝 Tema:</strong> {{material_topic}}</p>
+        <p><strong>👤 Autor:</strong> {{material_author}}</p>
       </div>
-      
-      <div style="text-align:center;">
-        <a href="{{link}}" class="button">
-          Ver Solicitud en ECIWISE
-        </a>
+
+      <p>Puedes acceder al material y revisarlo desde tu panel de ECIWISE.</p>
+
+      <div style="text-align: center;">
+        <a href="{{link}}" class="button">Ver material</a>
       </div>
 
       <p style="margin-top: 24px; color: #999; font-size: 14px;">
         Este es un correo automático, por favor no respondas a este mensaje.
       </p>
+
     </div>
 
+    <!-- FOOTER -->
     <div class="footer">
       © {{year}} ECIWISE — Todos los derechos reservados.
     </div>
 
   </div>
 </body>
-
 </html>
