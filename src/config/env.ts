@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import * as joi from 'joi';
 
+/** Tipado de variables de entorno esperadas */
 interface EnvVars {
   PORT: number;
   MAIL_FROM: string;
@@ -9,6 +10,8 @@ interface EnvVars {
   SERVICE_BUS_CONNECTION_STRING_ROL: string;
   SERVICE_BUS_CONNECTION_STRING: string;
 }
+
+/** Esquema de validación de env */
 const envsSchema = joi
   .object({
     PORT: joi.number().required(),
@@ -25,6 +28,7 @@ if (result.error) {
 }
 const envVars = result.value as EnvVars;
 
+/** Exporta envs normalizadas para uso interno */
 export const envs = {
   port: envVars.PORT,
   mailfrom: envVars.MAIL_FROM,

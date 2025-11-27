@@ -15,9 +15,13 @@ dotenv.config();
 
 @Injectable()
 export class AlertaService {
+  /** Logger interno del servicio */
   private readonly logger = new Logger(AlertaService.name);
+  
+  /** Cliente de SendGrid para envío de correos */
   private readonly sgMail: SendGridMailService;
 
+  /** Directorio base donde se encuentran las plantillas .hbs */
   private templatesDir = path.join(process.cwd(), 'src', 'templates');
 
   constructor(private prisma: PrismaService) {
@@ -27,6 +31,11 @@ export class AlertaService {
 
   //Endpoint
 
+  /**
+   * Obtiene todas las notificaciones de un usuario.
+   * @param userId ID del usuario propietario de las notificaciones.
+   * @returns Lista de notificaciones ordenadas por fecha de creación.
+   */
   async findByUser(userId: string): Promise<NotificacionDto[]> {
     try {
       const res = await this.prisma.notification.findMany({
@@ -47,6 +56,11 @@ export class AlertaService {
     }
   }
 
+  /**
+   * Obtiene la cantidad de notificaciones no leídas.
+   * @param userId ID del usuario.
+   * @returns Número de notificaciones sin abrir.
+   */
   async countUnread(userId: string) {
     try {
       return await this.prisma.notification.count({ where: { userId, visto: false } });
@@ -56,6 +70,10 @@ export class AlertaService {
     }
   }
 
+  /**
+   * Elimina una notificación por su ID.
+   * @param id Identificador de la notificación.
+   */
   async deleteById(id: string) {
     try {
       await this.prisma.notification.delete({ where: { id: Number(id) } });
@@ -68,6 +86,11 @@ export class AlertaService {
     }
   }
 
+  /**
+   * Marca todas las notificaciones de un usuario como leídas.
+   * @param userId ID del usuario.
+   * @returns Cantidad de notificaciones actualizadas.
+   */
   async markAllRead(userId: string) {
     try {
       const res = await this.prisma.notification.updateMany({
@@ -81,6 +104,11 @@ export class AlertaService {
     }
   }
 
+  /**
+   * Marca una notificación como leída.
+   * @param id ID de la notificación.
+   * @returns Notificación actualizada.
+   */
   async markRead(id: string) {
     try {
       const res = await this.prisma.notification.update({
@@ -99,7 +127,12 @@ export class AlertaService {
 
   //Crear notificaciones
 
-  /** Crear notificación en BD */
+  /**
+   * Crea una notificación en la base de datos.
+   * @param userId ID del usuario.
+   * @param titulo Título/asunto de la notificación.
+   * @param mensaje Resumen o contenido breve.
+   */
   private async crearNotificacionEnBD(userId: string, titulo: string, mensaje: string) {
     await this.prisma.notification.create({
       data: {
@@ -110,22 +143,37 @@ export class AlertaService {
     });
   }
 
-  /** Buscar usuario por email */
+  /**
+   * Busca un usuario por su correo electrónico.
+   * @param mail Correo del usuario.
+   * @throws NotFoundException si no existe.
+   */
   private async getUsuarioPorEmail(mail: string): Promise<User> {
     const user = await this.prisma.usuario.findUnique({ where: { email: mail } });
     if (!user) throw new NotFoundException('Usuario no encontrado');
     return user;
   }
-
-  /** Crear notificación para un receptor */
+  
+  /**
+   * Registra una notificación para un único receptor.
+   * @param informacion DTO con datos del correo.
+   */
   async registrarCorreoEnviado(informacion: UnicoMailDto) {
     const user = await this.getUsuarioPorEmail(informacion.email);
     const subject = (TemplateEnum as any)[informacion.template] ?? informacion.template;
     await this.crearNotificacionEnBD(user.id, subject, informacion.resumen);
   }
 
+<<<<<<< HEAD
   /** Crear notificaciones para varios receptores */
   async registrarCorreoEnviadoMasivas(informacion: any) {
+=======
+  /**
+   * Registra notificaciones para múltiples receptores.
+   * @param informacion DTO de envío masivo.
+   */
+  async registrarCorreoEnviadoMasivas(informacion: MasivoMailDto) {
+>>>>>>> 7bed035bb16b55cf26ce05953371ea39b930e9dc
     for (const receptor of informacion.receptores) {
         const notificacion: UnicoMailDto = {
             email: receptor.email,
@@ -140,6 +188,12 @@ export class AlertaService {
 
   //CORREOS
 
+  /**
+   * Carga una plantilla Handlebars desde disco.
+   * Si no existe, usa una plantilla por defecto.
+   * @param templateName Nombre base del archivo .hbs.
+   * @returns Contenido de la plantilla.
+   */
   private loadTemplate(templateName: string): string {
     const filePath = path.join(this.templatesDir, `${templateName}.hbs`);
 
@@ -150,7 +204,12 @@ export class AlertaService {
     return fs.readFileSync(filePath, 'utf8');
   }
 
-  /** Enviar correo con plantilla */
+  /**
+   * Envía un correo individual usando una plantilla Handlebars.
+   * Adjunta un logo si está disponible.
+   * @param correo DTO con datos del correo.
+   * @throws Error si SendGrid falla.
+   */
   async enviarCorreoIndividual(correo: UnicoMailDto ) {
     const source = this.loadTemplate(correo.template);
     const compiled = hbs.compile(source);
@@ -197,7 +256,15 @@ export class AlertaService {
     }
   }
 
+<<<<<<< HEAD
   async enviarCorreoMasivos(info : any){
+=======
+  /**
+   * Envío masivo de correos utilizando la lógica de envío individual.
+   * @param info DTO con receptores y plantilla.
+   */
+  async enviarCorreoMasivos(info : MasivoMailDto){
+>>>>>>> 7bed035bb16b55cf26ce05953371ea39b930e9dc
     for(const receptor of info.receptores){
       const correo: UnicoMailDto = {
         email: receptor.email,

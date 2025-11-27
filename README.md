@@ -1,3 +1,41 @@
+## Sobre el repositorio – Wise Alertas 
+
+Este repositorio contiene el módulo de notificaciones y mensajería asincrónica del ecosistema ECIWISE, implementado en NestJS, con soporte para:
+
+- Envío de correos individuales, masivos y por rol
+- Registro automático de notificaciones internas
+- Integración con Azure Service Bus
+- Almacenamiento de notificaciones en base de datos mediante Prisma
+- Plantillas dinámicas usando Handlebars
+- Soporte para múltiples módulos del sistema ECIWISE
+
+El servicio actúa como un microservicio especializado en alertas, capaz de ser extendido o acoplado con otros módulos del sistema, tales como:
+
+- Módulo de autenticación  
+- Módulo académico  
+- Módulo de recursos digitales  
+- Módulo de gestión de roles y permisos  
+
+Gracias a su arquitectura modular (Bus + Alerta + Prisma), el servicio está diseñado para ser:
+
+### Escalable
+Permite agregar nuevas colas, nuevas plantillas o nuevos tipos de notificación sin modificar la estructura base.
+
+### Reutilizable
+Puede integrarse con cualquier módulo que necesite comunicación con usuarios: estudiantes, docentes, administradores o servicios automáticos.
+
+### Adaptable
+El sistema de plantillas permite personalizar fácilmente correos según el módulo que lo invoque.
+
+### Extendible
+Es posible añadir nuevos canales (por ejemplo: WhatsApp, SMS, push notifications) usando la misma estructura del Bus.
+
+En resumen, este repositorio es la capa central de notificaciones del sistema ECIWISE, ofreciendo una forma estandarizada y robusta de enviar mensajes, registrar eventos y gestionar alertas de manera asincrónica.
+
+##
+
+## Documentación Nest
+
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
 </p>
