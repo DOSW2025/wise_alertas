@@ -42,9 +42,31 @@ Retorna el número total de notificaciones que el usuario aún no ha marcado com
   })
   @ApiResponse({
     status: 200,
-    description: 'Número de notificaciones no leídas',
+    description: 'Número de notificaciones no leídas.',
     schema: {
       example: { Count: 3 },
+    },
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Petición inválida (por ejemplo, formato incorrecto de userId).',
+    schema: {
+      example: {
+        statusCode: 400,
+        message: ['userId must be a string'],
+        error: 'Bad Request',
+      },
+    },
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Error interno al obtener el número de notificaciones no leídas.',
+    schema: {
+      example: {
+        statusCode: 500,
+        message: 'Error al contar notificaciones no leídas',
+        error: 'Internal Server Error',
+      },
     },
   })
   async unreadCount(@Param('userId') userId: string) {
@@ -86,11 +108,33 @@ Marca todas las notificaciones del usuario como leídas.
   })
   @ApiResponse({
     status: 200,
-    description: 'Cantidad de notificaciones marcadas como leídas',
+    description: 'Cantidad de notificaciones marcadas como leídas.',
     schema: {
       example: {
         mensaje: 'Notificaciones marcadas como leídas',
         cantidad: 5,
+      },
+    },
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Petición inválida.',
+    schema: {
+      example: {
+        statusCode: 400,
+        message: ['userId must be a string'],
+        error: 'Bad Request',
+      },
+    },
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Error interno al marcar las notificaciones como leídas.',
+    schema: {
+      example: {
+        statusCode: 500,
+        message: 'Error al marcar notificaciones como leídas',
+        error: 'Internal Server Error',
       },
     },
   })
@@ -125,7 +169,7 @@ Actualiza una notificación específica para marcarla como leída.
   })
   @ApiResponse({
     status: 200,
-    description: 'Notificación marcada como leída',
+    description: 'Notificación marcada como leída.',
     schema: {
       example: {
         mensaje: 'Notificación marcada como leída',
@@ -134,8 +178,37 @@ Actualiza una notificación específica para marcarla como leída.
     },
   })
   @ApiResponse({
+    status: 400,
+    description: 'Petición inválida.',
+    schema: {
+      example: {
+        statusCode: 400,
+        message: ['id must be a string'],
+        error: 'Bad Request',
+      },
+    },
+  })
+  @ApiResponse({
     status: 404,
-    description: 'Notificación no encontrada',
+    description: 'Notificación no encontrada.',
+    schema: {
+      example: {
+        statusCode: 404,
+        message: 'Notificación no encontrada',
+        error: 'Not Found',
+      },
+    },
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Error interno al marcar la notificación como leída.',
+    schema: {
+      example: {
+        statusCode: 500,
+        message: 'Error al marcar notificación como leída',
+        error: 'Internal Server Error',
+      },
+    },
   })
   async markRead(@Param('id') id: string) {
     await this.alertaService.markRead(id);
@@ -176,7 +249,7 @@ Elimina una notificación de manera permanente según su ID.
   })
   @ApiResponse({
     status: 200,
-    description: 'Notificación eliminada',
+    description: 'Notificación eliminada correctamente.',
     schema: {
       example: {
         mensaje: 'Notificación eliminada',
@@ -185,8 +258,37 @@ Elimina una notificación de manera permanente según su ID.
     },
   })
   @ApiResponse({
+    status: 400,
+    description: 'Petición inválida.',
+    schema: {
+      example: {
+        statusCode: 400,
+        message: ['id must be a string'],
+        error: 'Bad Request',
+      },
+    },
+  })
+  @ApiResponse({
     status: 404,
-    description: 'Notificación no encontrada',
+    description: 'Notificación no encontrada.',
+    schema: {
+      example: {
+        statusCode: 404,
+        message: 'Notificación no encontrada',
+        error: 'Not Found',
+      },
+    },
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Error interno al eliminar la notificación.',
+    schema: {
+      example: {
+        statusCode: 500,
+        message: 'Error al eliminar notificación',
+        error: 'Internal Server Error',
+      },
+    },
   })
   async delete(@Param('id') id: string) {
     await this.alertaService.deleteById(id);
@@ -234,9 +336,31 @@ Retorna todas las notificaciones asociadas a un usuario, ordenadas de la más re
   })
   @ApiResponse({
     status: 200,
-    description: 'Lista de notificaciones del usuario',
+    description: 'Lista de notificaciones del usuario.',
     type: NotificacionDto,
     isArray: true,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Petición inválida.',
+    schema: {
+      example: {
+        statusCode: 400,
+        message: ['userId must be a string'],
+        error: 'Bad Request',
+      },
+    },
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Error interno al obtener las notificaciones del usuario.',
+    schema: {
+      example: {
+        statusCode: 500,
+        message: 'Error al obtener notificaciones',
+        error: 'Internal Server Error',
+      },
+    },
   })
   async getByUser(@Param('userId') userId: string): Promise<NotificacionDto[]> {
     const notifications = await this.alertaService.findByUser(userId);
