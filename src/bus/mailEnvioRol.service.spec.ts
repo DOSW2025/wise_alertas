@@ -4,7 +4,7 @@ import { AlertaService } from '../alerta/alerta.service';
 import { PrismaService } from '../prisma/prisma.service';
 
 /**
- * Pruebas unitarias para el servicio MailEnvioMasivo
+ * Pruebas unitarias para el servicio MailEnvioRol
  */
 jest.mock('../config/env', () => ({
   envs: {
