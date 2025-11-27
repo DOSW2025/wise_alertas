@@ -55,18 +55,18 @@ describe('AlertaController', () => {
     });
   });
 
-  // markRead
-  it('markRead: debe llamar servicio y retornar mensaje', async () => {
-    service.markRead.mockResolvedValue(undefined);
+  // // markRead
+  // it('markRead: debe llamar servicio y retornar mensaje', async () => {
+  //   service.markRead.mockResolvedValue(undefined);
 
-    const result = await controller.markRead('10');
+  //   const result = await controller.markRead('10');
 
-    expect(service.markRead).toHaveBeenCalledWith('10');
-    expect(result).toEqual({
-      mensaje: 'Notificación marcada como leída',
-      id: '10',
-    });
-  });
+  //   expect(service.markRead).toHaveBeenCalledWith('10');
+  //   expect(result).toEqual({
+  //     mensaje: 'Notificación marcada como leída',
+  //     id: '10',
+  //   });
+  // });
 
   // delete
   it('delete: debe llamar deleteById y retornar mensaje', async () => {

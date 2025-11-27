@@ -87,9 +87,9 @@ describe('AlertaService', () => {
     // Add backward-compatible aliases for older test names to avoid changing many tests
     (service as any).registrarCorreoEnviado = (info: any) => (service as any).registrarCorreoIndividual(info);
     (service as any).registrarCorreoEnviadoMasivas = (info: any) => {
-      // older behavior expected: iterate receptores and call registrarCorreoEnviado
+      // older behavior expected: iterate receptores and call registrarCorreoEnviado (alias)
       if (info.receptores && Array.isArray(info.receptores)) {
-        return Promise.all(info.receptores.map((r: any) => (service as any).registrarCorreoIndividual({ ...r, ...info })));
+        return Promise.all(info.receptores.map((r: any) => (service as any).registrarCorreoEnviado({ ...r, ...info })));
       }
       // if called with a Rol-like payload, map to registrarCorreoPorRol
       return (service as any).registrarCorreoPorRol(info);

@@ -62,6 +62,11 @@ export class AlertaController {
     },
   })
 
+  async markAllRead(@Param('userId') userId: string) {
+    const cantidad = await this.alertaService.markAllRead(userId);
+    return { mensaje: 'Notificaciones marcadas como leídas', cantidad };
+  }
+
   /**
    * Marca como leída una notificación específica.
    */

@@ -9,7 +9,8 @@ describe('config/env.ts', () => {
 
   beforeEach(() => {
     jest.resetModules(); 
-    process.env = { ...ORIGINAL_ENV }; 
+    // Start each test with an empty env to avoid interference from the running system
+    process.env = {} as NodeJS.ProcessEnv;
   });
 
   afterAll(() => {
@@ -27,6 +28,9 @@ describe('config/env.ts', () => {
     process.env.SERVICE_BUS_CONNECTION_STRING_MASIVO = 'conn3';
 
     const { envs } = loadEnv();
+    // debug
+    // eslint-disable-next-line no-console
+    console.log('DEBUG envs export:', envs);
 
     expect(envs.port).toBe(3000);
     expect(envs.mailfrom).toBe('test@example.com');
@@ -44,6 +48,9 @@ describe('config/env.ts', () => {
     process.env.SERVICE_BUS_CONNECTION_STRING_ROL = 'conn2';
     process.env.SERVICE_BUS_CONNECTION_STRING_MASIVO = 'conn3';
 
+    // debug: print PORT presence
+    // eslint-disable-next-line no-console
+    console.log('DEBUG env before loadEnv PORT=', process.env.PORT);
     expect(() => loadEnv()).toThrow(/Config validation error/);
   });
 
