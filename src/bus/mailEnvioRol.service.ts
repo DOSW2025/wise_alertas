@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { BaseBusService } from '../common/base-bus.service';
 import { AlertaService } from '../alerta/alerta.service';
 import { envs } from '../config/env';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { RolMailDto } from './dto/rolMail.dto';
 import { UnicoMailDto } from './dto/unicoMail.dto';
 import { User } from 'src/alerta/entitys/user.entity';
@@ -43,7 +43,9 @@ export class MailEnvioRol extends BaseBusService {
         apellido: true,
       },
     });
-
+    if (messageContent.mandarCorreo === undefined || messageContent.mandarCorreo === null) {
+      messageContent.mandarCorreo = true;
+    }
     for (const usuario of usuarios) {
       const individualMessage: UnicoMailDto = {
         email: usuario.email,
@@ -54,7 +56,7 @@ export class MailEnvioRol extends BaseBusService {
 
       };
 
-      if (!messageContent.mandarCorreo) {
+      if (messageContent.mandarCorreo) {
         await this.alertaService.enviarCorreoIndividual(individualMessage);
       }
 

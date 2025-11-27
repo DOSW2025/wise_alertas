@@ -16,5 +16,6 @@ export enum TemplateEnum {
     CompletacionTutoriaEstudiante ='Su tutoría ha sido completada',
     CompletacionTutoriaTutor ='Se ha completado una tutoría',
     //Materales
+    nuevoMaterialSubido = 'Se ha subido un nuevo material',
 
 }

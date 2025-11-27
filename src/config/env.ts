@@ -7,7 +7,7 @@ interface EnvVars {
   SENDGRID_API_KEY: string;
   SERVICE_BUS_CONNECTION_STRING_UN_MAIL: string;
   SERVICE_BUS_CONNECTION_STRING_ROL: string;
-  SERVICE_BUS_CONNECTION_STRING_MASIVO: string;
+  SERVICE_BUS_CONNECTION_STRING: string;
 }
 const envsSchema = joi
   .object({
@@ -16,7 +16,7 @@ const envsSchema = joi
     SENDGRID_API_KEY: joi.string().required(),
     SERVICE_BUS_CONNECTION_STRING_UN_MAIL: joi.string().required(),
     SERVICE_BUS_CONNECTION_STRING_ROL: joi.string().required(),
-    SERVICE_BUS_CONNECTION_STRING_MASIVO: joi.string().required(),
+    SERVICE_BUS_CONNECTION_STRING: joi.string().required(),
   })
   .unknown(true);
 const result = envsSchema.validate(process.env);
@@ -31,5 +31,5 @@ export const envs = {
   sendgridapikey: envVars.SENDGRID_API_KEY,
   mailenvioindividualconnectionstring: envVars.SERVICE_BUS_CONNECTION_STRING_UN_MAIL,
   mailenviorolconnectionstring: envVars.SERVICE_BUS_CONNECTION_STRING_ROL,
-  mailenviomasivoconnectionstring: envVars.SERVICE_BUS_CONNECTION_STRING_MASIVO,
+  serviceBusConnectionString: envVars.SERVICE_BUS_CONNECTION_STRING,
 };

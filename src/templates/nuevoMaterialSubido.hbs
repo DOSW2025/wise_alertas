@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     body {
-      margin: 1;
+      margin: 0;
       padding: 0;
       background-color: #f4f4f7;
       font-family: Arial, Helvetica, sans-serif;
@@ -13,7 +14,7 @@
     .container {
       max-width: 600px;
       margin: auto;
-      background: #fffff;
+      background: #ffffff;
       border-radius: 8px;
       overflow: hidden;
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
@@ -33,6 +34,15 @@
       color: #333;
       font-size: 16px;
       line-height: 1.6;
+    }
+
+    .info-box {
+      background: #f0f6ff;
+      border-left: 5px solid #0066cc;
+      padding: 16px;
+      margin: 20px 0;
+      border-radius: 6px;
+      font-size: 15px;
     }
     .button {
       display: inline-block;
@@ -59,30 +69,34 @@
     <!-- HEADER -->
     <div class="header">
       <img src="cid:logo" alt="ECIWISE Logo" />
-      <h2>¡Bienvenido a ECIWISE!</h2>
+      <h2>Nuevo material disponible</h2>
     </div>
 
     <!-- CONTENT -->
     <div class="content">
+
       <p>Hola <strong>{{name}}</strong>,</p>
 
-      <p>
-        ¡Gracias por unirte a <strong>ECIWISE</strong>!
-      </p>
+      <p>Se ha subido un nuevo material que podría ser útil para tu proceso académico.</p>
 
-      <p>
-        Ya estás listo para recibir alertas y notificaciones importantes.
-        Si tienes alguna pregunta o necesitas ayuda, no dudes en contactarnos.
-      </p>
+      <!-- INFO BOX -->
+      <div class="info-box">
+        <p><strong>📘 Nombre del material:</strong> {{material_name}}</p>
+        <p><strong>📚 Materia:</strong> {{material_subject}}</p>
+        <p><strong>📝 Tema:</strong> {{material_topic}}</p>
+        <p><strong>👤 Autor:</strong> {{material_author}}</p>
+      </div>
 
-      <!-- CENTRAR BOTÓN -->
+      <p>Puedes acceder al material y revisarlo desde tu panel de ECIWISE.</p>
+
       <div style="text-align: center;">
-        <a href="https://wise-front-git-develop-marianellapolo7-2222s-projects.vercel.app/?_vercel_share=ETZpfmG4JpnK7fzvXd8Li49OXSRSwNmM" class="button">Ir a ECIWISE</a>
+        <a href="{{material_url}}" class="button">Ver material</a>
       </div>
 
       <p style="margin-top: 24px; color: #999; font-size: 14px;">
         Este es un correo automático, por favor no respondas a este mensaje.
       </p>
+
     </div>
 
     <!-- FOOTER -->

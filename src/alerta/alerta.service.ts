@@ -8,7 +8,6 @@ import * as hbs from 'handlebars';
 import * as dotenv from 'dotenv';
 import { User } from './entitys/user.entity';
 import { UnicoMailDto } from 'src/bus/dto/unicoMail.dto';
-import { MasivoMailDto } from 'src/bus/dto/masivoMail.dto';
 import { NotificacionDto } from './dto/notificacion.dto';
 import { TemplateEnum } from './enums/template.enum';
 
@@ -126,7 +125,7 @@ export class AlertaService {
   }
 
   /** Crear notificaciones para varios receptores */
-  async registrarCorreoEnviadoMasivas(informacion: MasivoMailDto) {
+  async registrarCorreoEnviadoMasivas(informacion: any) {
     for (const receptor of informacion.receptores) {
         const notificacion: UnicoMailDto = {
             email: receptor.email,
@@ -182,7 +181,7 @@ export class AlertaService {
 
     const msg: any = {
       to: correo.email,
-      from: { email: envs.mailfrom, name: 'Eciwise Alerts' },
+      from: { email: envs.mailfrom, name: 'Eciwise' },
       subject,
       html,
     };
@@ -198,7 +197,7 @@ export class AlertaService {
     }
   }
 
-  async enviarCorreoMasivos(info : MasivoMailDto){
+  async enviarCorreoMasivos(info : any){
     for(const receptor of info.receptores){
       const correo: UnicoMailDto = {
         email: receptor.email,
