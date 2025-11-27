@@ -78,7 +78,8 @@
       "**/*.service.ts",
       "**/*.controller.ts",
       "common/base-bus.service.ts",
-      "!prisma/prisma.service.ts"
+      "!prisma/prisma.service.ts",
+      "config/env.ts"
     ],
     "coverageDirectory": "../coverage",
     "coverageReporters": [

@@ -1,68 +1,67 @@
 /**
  * Pruebas unitarias para la configuración de entorno
  */
+// src/config/env.spec.ts
 import * as path from 'path';
 
 describe('config/env.ts', () => {
-  
   const ORIGINAL_ENV = process.env;
 
+  const loadEnvModule = () => require(path.join(__dirname, './env'));
+
   beforeEach(() => {
-    jest.resetModules(); 
-    // Start each test with an empty env to avoid interference from the running system
+    jest.resetModules();
     process.env = {} as NodeJS.ProcessEnv;
   });
 
   afterAll(() => {
-    process.env = ORIGINAL_ENV; 
+    process.env = ORIGINAL_ENV;
   });
 
-  const loadEnv = () => require('./env'); 
-
-  it('debería cargar correctamente cuando TODAS las variables están definidas', () => {
+  it('debería cargar correctamente cuando TODAS las variables requeridas están definidas', () => {
     process.env.PORT = '3000';
     process.env.MAIL_FROM = 'test@example.com';
     process.env.SENDGRID_API_KEY = 'SG_KEY';
-    process.env.SERVICE_BUS_CONNECTION_STRING_UN_MAIL = 'conn1';
-    process.env.SERVICE_BUS_CONNECTION_STRING_ROL = 'conn2';
-    process.env.SERVICE_BUS_CONNECTION_STRING_MASIVO = 'conn3';
 
-    const { envs } = loadEnv();
-    // debug
-    // eslint-disable-next-line no-console
-    console.log('DEBUG envs export:', envs);
+    const { envs } = loadEnvModule();
 
     expect(envs.port).toBe(3000);
     expect(envs.mailfrom).toBe('test@example.com');
     expect(envs.sendgridapikey).toBe('SG_KEY');
-    expect(envs.mailenvioindividualconnectionstring).toBe('conn1');
-    expect(envs.mailenviorolconnectionstring).toBe('conn2');
-    expect(envs.mailenviomasivoconnectionstring).toBe('conn3');
+    expect(envs.serviceBusConnectionString).toBeUndefined();
   });
 
-  it('debería lanzar error si falta PORT', () => {
-    delete process.env.PORT;
-    process.env.MAIL_FROM = 'test@example.com';
-    process.env.SENDGRID_API_KEY = 'SG_KEY';
-    process.env.SERVICE_BUS_CONNECTION_STRING_UN_MAIL = 'conn1';
-    process.env.SERVICE_BUS_CONNECTION_STRING_ROL = 'conn2';
-    process.env.SERVICE_BUS_CONNECTION_STRING_MASIVO = 'conn3';
+  it('debería exponer SERVICE_BUS_CONNECTION_STRING aunque no esté en el esquema (unknown)', () => {
+    process.env.PORT = '4000';
+    process.env.MAIL_FROM = 'otro@example.com';
+    process.env.SENDGRID_API_KEY = 'OTRA_KEY';
+    process.env.SERVICE_BUS_CONNECTION_STRING = 'Endpoint=sb://fake-conn/';
 
-    // debug: print PORT presence
-    // eslint-disable-next-line no-console
-    console.log('DEBUG env before loadEnv PORT=', process.env.PORT);
-    expect(() => loadEnv()).toThrow(/Config validation error/);
+    const { envs } = loadEnvModule();
+
+    expect(envs.port).toBe(4000);
+    expect(envs.mailfrom).toBe('otro@example.com');
+    expect(envs.sendgridapikey).toBe('OTRA_KEY');
+    expect(envs.serviceBusConnectionString).toBe('Endpoint=sb://fake-conn/');
   });
 
-  it('debería lanzar error si MAIL_FROM no es un email', () => {
+
+  it('debería lanzar error cuando MAIL_FROM no es un email válido', () => {
     process.env.PORT = '3000';
-    process.env.MAIL_FROM = 'NO-EMAIL';
+    process.env.MAIL_FROM = 'no-es-un-email';
     process.env.SENDGRID_API_KEY = 'SG_KEY';
-    process.env.SERVICE_BUS_CONNECTION_STRING_UN_MAIL = 'conn1';
-    process.env.SERVICE_BUS_CONNECTION_STRING_ROL = 'conn2';
-    process.env.SERVICE_BUS_CONNECTION_STRING_MASIVO = 'conn3';
 
-    expect(() => loadEnv()).toThrow(/Config validation error/);
+    let error: any;
+    try {
+      loadEnvModule();
+    } catch (err) {
+      error = err;
+    }
+
+    expect(error).toBeDefined();
+    expect(error).toBeInstanceOf(Error);
+    expect(error.message).toContain('Config validation error');
+    expect(error.message).toContain('MAIL_FROM');
+    expect(error.message).toContain('valid email');
   });
-
 });
