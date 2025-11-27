@@ -7,10 +7,12 @@ import * as path from 'path';
 import * as hbs from 'handlebars';
 import * as dotenv from 'dotenv';
 import { User } from './entitys/user.entity';
-import { UnicoMailDto } from 'src/bus/dto/unicoMail.dto';
-import { MasivoMailDto } from 'src/bus/dto/masivoMail.dto';
+import { UnicoMailDto } from 'src/alerta/dto/unicoMail.dto';
 import { NotificacionDto } from './dto/notificacion.dto';
 import { TemplateEnum } from './enums/template.enum';
+import { ServiceBusClient} from '@azure/service-bus';
+import { RolMailDto } from './dto/rolMail.dto';
+
 
 dotenv.config();
 
@@ -18,15 +20,21 @@ dotenv.config();
 export class AlertaService {
   private readonly logger = new Logger(AlertaService.name);
   private readonly sgMail: SendGridMailService;
+  private rolQueue;
+  private uniqueQueue; 
 
   private templatesDir = path.join(process.cwd(), 'src', 'templates');
 
-  constructor(private prisma: PrismaService) {
+  constructor(private prisma: PrismaService,private readonly client: ServiceBusClient) {
     this.sgMail = new SendGridMailService();
     this.sgMail.setApiKey(envs.sendgridapikey);
+    this.rolQueue = this.client.createReceiver('mail.envio.rol');
+    this.uniqueQueue = this.client.createReceiver('mail.envio.individual');
+    this.listenForUniqueQueue();
+    this.listenForRolQueue();
   }
 
-  //Endpoint
+  //Endpoints
 
   async findByUser(userId: string): Promise<NotificacionDto[]> {
     try {
@@ -119,23 +127,21 @@ export class AlertaService {
   }
 
   /** Crear notificación para un receptor */
-  async registrarCorreoEnviado(informacion: UnicoMailDto) {
+  async registrarCorreoIndividual(informacion: UnicoMailDto) {
     const user = await this.getUsuarioPorEmail(informacion.email);
     const subject = (TemplateEnum as any)[informacion.template] ?? informacion.template;
     await this.crearNotificacionEnBD(user.id, subject, informacion.resumen);
   }
 
   /** Crear notificaciones para varios receptores */
-  async registrarCorreoEnviadoMasivas(informacion: MasivoMailDto) {
-    for (const receptor of informacion.receptores) {
+  async registrarCorreoPorRol(informacion: RolMailDto) {
+    const users = await this.encontrarUsuariosPorRol(informacion.rol);
+    for (const user of users) {
         const notificacion: UnicoMailDto = {
-            email: receptor.email,
-            name: receptor.name,
-            template: informacion.template,
-            resumen: informacion.resumen,
-            guardar: informacion.guardar,
+        email: user.email,
+        name: `${user.nombre} ${user.apellido}`,...informacion,
       };
-      await this.registrarCorreoEnviado(notificacion);
+      await this.registrarCorreoIndividual(notificacion);
     }
   }
 
@@ -198,17 +204,75 @@ export class AlertaService {
     }
   }
 
-  async enviarCorreoMasivos(info : MasivoMailDto){
-    for(const receptor of info.receptores){
+  private async encontrarUsuariosPorRol(rol: string): Promise<User[]> {
+    const usuarios : User[] = await this.prisma.usuario.findMany({
+      where: {
+        rol: { nombre: rol },
+      },
+      select: {
+        id: true,
+        email: true,
+        nombre: true,
+        apellido: true,
+      },
+    });
+    return usuarios;
+  }
+
+  async enviarCorreoPorRol(info : RolMailDto){
+    const usuarios  = await this.encontrarUsuariosPorRol(info.rol);
+    for(const usuario of usuarios){
       const correo: UnicoMailDto = {
-        email: receptor.email,
-        name: receptor.name,
-        template: info.template,
-        resumen: info.resumen,        
-        guardar: info.guardar,
+        email: usuario.email,
+        name: `${usuario.nombre} ${usuario.apellido}`,...info,
       };
       await this.enviarCorreoIndividual(correo);
     }
+  }
+
+  //metodos para escuchar las colas
+
+
+  /**
+   * Escuchar la cola de roles para procesar mensajes
+   */
+  private listenForRolQueue() {
+    this.rolQueue.subscribe({
+      processMessage: async (message) => {
+        if (message.body.mandarCorreo) {
+          await this.enviarCorreoPorRol(message.body as RolMailDto);
+        }
+        if (message.body.guardar) {
+          await this.registrarCorreoPorRol(message.body as RolMailDto);
+        }
+        this.logger.log(`Mensaje procesado en rolQueue: ${message.body}`);
+      },
+      processError: async (err) => { 
+        this.logger.error('Error en rolQueue: ', err); 
+      }, 
+    });
+  }
+
+  /** Escuchar la cola de únicos para procesar mensajes
+   */
+  private listenForUniqueQueue() {
+    
+    this.uniqueQueue.subscribe({
+      processMessage: async (message) => {
+        if (message.body.mandarCorreo) {
+          await this.enviarCorreoIndividual(message.body as UnicoMailDto);
+        }
+        if (message.body.guardar) {
+          await this.registrarCorreoIndividual(message.body as UnicoMailDto);
+        }
+
+
+        this.logger.log(`Mensaje procesado en uniqueQueue: ${message.body}`);
+      },
+      processError: async (err) => { 
+        this.logger.error('Error en uniqueQueue: ', err); 
+      }, 
+    }); 
   }
 
 }
