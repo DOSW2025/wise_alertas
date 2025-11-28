@@ -34,22 +34,24 @@ model EstadoUsuario {
 }
 
 model Usuario {
-  id            String         @id @default(uuid())
-  email         String         @unique
-  nombre        String
-  apellido      String
-  telefono      String?
-  semestre      Int            @default(1)
-  ultimo_login  DateTime?      @map("ultimo_login")
-  createdAt     DateTime       @default(now()) @map("created_at")
-  updatedAt     DateTime       @updatedAt @map("updated_at")
-  avatar_url    String?        @map("avatar_url")
-  google_id     String?        @unique @map("google_id")
-  estadoId      Int            @default(1) @map("estado_id")
-  rolId         Int            @default(1) @map("rol_id")
-  notifications Notification[]
-  estado        EstadoUsuario  @relation(fields: [estadoId], references: [id])
-  rol           Rol            @relation(fields: [rolId], references: [id])
+  id                                  String          @id @default(uuid())
+  email                               String          @unique
+  nombre                              String
+  apellido                            String
+  telefono                            String?
+  semestre                            Int             @default(1)
+  ultimo_login                        DateTime?       @map("ultimo_login")
+  createdAt                           DateTime        @default(now()) @map("created_at")
+  updatedAt                           DateTime        @updatedAt @map("updated_at")
+  avatar_url                          String?         @map("avatar_url")
+  google_id                           String?         @unique @map("google_id")
+  estadoId                            Int             @default(1) @map("estado_id")
+  rolId                               Int             @default(1) @map("rol_id")
+  biografia                           String?
+  disponibilidad                      Json?
+  notifications                       notifications[]
+  estado                              EstadoUsuario   @relation(fields: [estadoId], references: [id])
+  rol                                 Rol             @relation(fields: [rolId], references: [id])
 
   @@index([email])
   @@index([estadoId])
@@ -57,14 +59,14 @@ model Usuario {
   @@map("usuarios")
 }
 
-model Notification {
+model notifications {
   id            Int      @unique @default(autoincrement())
   userId        String
   fechaCreacion DateTime @default(now())
   asunto        String
   resumen       String
   visto         Boolean  @default(false)
-  user          Usuario  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  usuarios      Usuario  @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([id, userId])
 }
