@@ -38,7 +38,7 @@ export class AlertaService {
 
   async findByUser(userId: string): Promise<NotificacionDto[]> {
     try {
-      const res = await this.prisma.notification.findMany({
+      const res = await this.prisma.notifications.findMany({
         where: { userId },
         orderBy: { fechaCreacion: 'desc' },
       });
@@ -58,7 +58,7 @@ export class AlertaService {
 
   async countUnread(userId: string) {
     try {
-      return await this.prisma.notification.count({ where: { userId, visto: false } });
+      return await this.prisma.notifications.count({ where: { userId, visto: false } });
     } catch (err) {
       this.logger.error(`Error contando notificaciones no leídas para usuario ${userId}:`, err);
       throw new HttpException('Error al contar notificaciones no leídas', HttpStatus.INTERNAL_SERVER_ERROR);
@@ -67,7 +67,7 @@ export class AlertaService {
 
   async deleteById(id: string) {
     try {
-      await this.prisma.notification.delete({ where: { id: Number(id) } });
+      await this.prisma.notifications.delete({ where: { id: Number(id) } });
     } catch (err: any) {
       this.logger.error(`Error eliminando notificación ${id}:`, err);
       if (err?.code === 'P2025' || /not found/i.test(err.message || '')) {
@@ -79,7 +79,7 @@ export class AlertaService {
 
   async markAllRead(userId: string) {
     try {
-      const res = await this.prisma.notification.updateMany({
+      const res = await this.prisma.notifications.updateMany({
         where: { userId, visto: false },
         data: { visto: true },
       });
@@ -92,7 +92,7 @@ export class AlertaService {
 
   async markRead(id: string) {
     try {
-      const res = await this.prisma.notification.update({
+      const res = await this.prisma.notifications.update({
         where: { id: Number(id) },
         data: { visto: true },
       });
@@ -110,7 +110,7 @@ export class AlertaService {
 
   /** Crear notificación en BD */
   private async crearNotificacionEnBD(userId: string, titulo: string, mensaje: string) {
-    await this.prisma.notification.create({
+    await this.prisma.notifications.create({
       data: {
         userId,
         asunto: titulo,
