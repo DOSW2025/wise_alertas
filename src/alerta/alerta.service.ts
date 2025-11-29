@@ -240,7 +240,7 @@ export class AlertaService {
     this.rolQueue.subscribe({
       processMessage: async (message) => {
         
-        if (messageContent.mandarCorreo === undefined || messageContent.mandarCorreo === null) {
+        if (message.body.mandarCorreo === undefined || message.body.mandarCorreo === null) {
           messageContent.mandarCorreo = true;
         }
         
@@ -265,7 +265,7 @@ export class AlertaService {
     this.uniqueQueue.subscribe({
       processMessage: async (message) => {
 
-        if (messageContent.mandarCorreo === undefined || messageContent.mandarCorreo === null) {
+        if (message.body.mandarCorreo === undefined || message.body.mandarCorreo === null) {
           messageContent.mandarCorreo = true;
         }
         
