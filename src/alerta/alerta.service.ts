@@ -241,7 +241,7 @@ export class AlertaService {
       processMessage: async (message) => {
         
         if (message.body.mandarCorreo === undefined || message.body.mandarCorreo === null) {
-          messageContent.mandarCorreo = true;
+          message.body.mandarCorreo = true;
         }
         
         if (message.body.mandarCorreo) {
@@ -266,7 +266,7 @@ export class AlertaService {
       processMessage: async (message) => {
 
         if (message.body.mandarCorreo === undefined || message.body.mandarCorreo === null) {
-          messageContent.mandarCorreo = true;
+          message.body.mandarCorreo = true;
         }
         
         if (message.body.mandarCorreo) {
