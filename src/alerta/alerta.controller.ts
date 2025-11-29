@@ -161,7 +161,7 @@ Actualiza una notificación específica para marcarla como leída.
 }
 \`\`\`
 `
-  })  
+  })
   @ApiParam({
     name: 'id',
     description: 'ID de la notificación que se desea marcar como leída',
