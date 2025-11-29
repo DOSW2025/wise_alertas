@@ -239,6 +239,11 @@ export class AlertaService {
   private listenForRolQueue() {
     this.rolQueue.subscribe({
       processMessage: async (message) => {
+        
+        if (messageContent.mandarCorreo === undefined || messageContent.mandarCorreo === null) {
+          messageContent.mandarCorreo = true;
+        }
+        
         if (message.body.mandarCorreo) {
           await this.enviarCorreoPorRol(message.body as RolMailDto);
         }
@@ -259,6 +264,11 @@ export class AlertaService {
     
     this.uniqueQueue.subscribe({
       processMessage: async (message) => {
+
+        if (messageContent.mandarCorreo === undefined || messageContent.mandarCorreo === null) {
+          messageContent.mandarCorreo = true;
+        }
+        
         if (message.body.mandarCorreo) {
           await this.enviarCorreoIndividual(message.body as UnicoMailDto);
         }
