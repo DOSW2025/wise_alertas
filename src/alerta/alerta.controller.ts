@@ -23,7 +23,7 @@ Retorna el número total de notificaciones que el usuario aún no ha marcado com
 
 **Uso esperado:**
 - Este endpoint permite a cualquier módulo del sistema consultar cuántas notificaciones pendientes tiene un usuario.
-- Es especialmente útil para mostrar badgets, contadores o alertas en la interfaz.
+- Es especialmente útil para mostrar badges, contadores o alertas en la interfaz.
 
 **Validaciones:**
 - El \`userId\` debe existir en el sistema.
