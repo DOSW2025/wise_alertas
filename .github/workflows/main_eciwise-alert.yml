@@ -27,7 +27,8 @@ jobs:
         run: |
           npm install
           npm run build --if-present
-          npm run test --if-present || true
+          npm run test --if-present
+
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
@@ -50,9 +51,9 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_9856893F31194B41B29D4642C7BD6BF5 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_521F5A98690A45D5A3EB2EE629924EA4 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_6D043972DAEF4A08A825D1AD46497432 }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_9C05B6BEEDA744E8903C0B983A7A13F9 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_C57FCBB2591D4C4A8AFBB90641FF7564 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_563291B3E90846A287CEBF17A24D525C }}
 
       - name: 'Deploy to Azure Web App'
         id: deploy-to-webapp
@@ -61,5 +62,4 @@ jobs:
           app-name: 'eciwise-alert'
           slot-name: 'Production'
           package: .
-
           
