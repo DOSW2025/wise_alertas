@@ -1,11 +1,11 @@
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../generated/prisma"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
 
@@ -23,23 +23,24 @@ model Notification {
 }
 
 model Usuario {
-  id                String          @id @default(uuid())
-  email             String          @unique
-  nombre            String
-  apellido          String
-  telefono          String?
-  biografia         String?
-  semestre          Int             @default(1)
-  google_id         String?         @unique @map("google_id")
-  avatar_url        String?         @map("avatar_url")
-  rolId             Int             @default(1) @map("rol_id")
-  estadoId          Int             @default(1) @map("estado_id")
-  ultimo_login      DateTime?       @map("ultimo_login")
-  disponibilidad    Json?
-  createdAt         DateTime        @default(now()) @map("created_at")
-  updatedAt         DateTime        @updatedAt @map("updated_at")
-  notifications     Notification[]
-  rol               Rol             @relation(fields: [rolId], references: [id])
+  id                                  String         @id @default(uuid())
+  email                               String         @unique
+  nombre                              String
+  apellido                            String
+  telefono                            String?
+  biografia                           String?
+  semestre                            Int            @default(1)
+  google_id                           String?        @unique @map("google_id")
+  avatar_url                          String?        @map("avatar_url")
+  rolId                               Int            @default(1) @map("rol_id")
+  estadoId                            Int            @default(1) @map("estado_id")
+  ultimo_login                        DateTime?      @map("ultimo_login")
+  disponibilidad                      Json?
+  createdAt                           DateTime       @default(now()) @map("created_at")
+  updatedAt                           DateTime       @updatedAt @map("updated_at")
+  notifications                       Notification[]
+  estado                              EstadoUsuario  @relation(fields: [estadoId], references: [id])
+  rol                                 Rol            @relation(fields: [rolId], references: [id])
 
   @@index([email])
   @@index([estadoId])
@@ -57,4 +58,16 @@ model Rol {
   usuarios    Usuario[]
 
   @@map("roles")
+}
+
+model EstadoUsuario {
+  id          Int       @id @default(autoincrement())
+  nombre      String    @unique
+  descripcion String?
+  activo      Boolean   @default(true)
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  usuarios    Usuario[]
+
+  @@map("estados_usuario")
 }
