@@ -22,7 +22,6 @@ export class AlertaService {
   private readonly sgMail: SendGridMailService;
   private rolQueue;
   private uniqueQueue; 
-
   private templatesDir = path.join(process.cwd(), 'src', 'templates');
 
   constructor(private prisma: PrismaService,private readonly client: ServiceBusClient) {
@@ -129,7 +128,7 @@ export class AlertaService {
   /** Crear notificación para un receptor */
   async registrarCorreoIndividual(informacion: UnicoMailDto) {
     const user = await this.getUsuarioPorEmail(informacion.email);
-    const subject = (TemplateEnum as any)[informacion.template] ?? informacion.template;
+    const subject = (TemplateEnum as any)[informacion.template] ?? informacion.template + `${informacion.nombreGrupo ? ' ' + informacion.nombreGrupo : ''}`;
     await this.crearNotificacionEnBD(user.id, subject, informacion.resumen);
   }
 
