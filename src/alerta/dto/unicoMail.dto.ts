@@ -18,12 +18,13 @@ export class UnicoMailDto {
 
     /** Nombre del destinatario */
     @IsString()
+    @IsOptional()
     @ApiProperty({
         example: 'Carlos Gómez',
-        required: true,
+        required: false,
         description: 'Nombre del usuario que recibirá el mensaje.'
     })
-    name!: string;
+    name?: string;
 
     /** Nombre interno de la plantilla */
     @IsString()
@@ -83,7 +84,7 @@ export class UnicoMailDto {
         example: 'Programación Básica',
         description: 'Tema del material relacionado con el correo.'
     })
-    material_topic?: string;
+    tema?: string;
 
     /** Autor del material */
     @IsString()
@@ -128,6 +129,10 @@ export class UnicoMailDto {
     @IsOptional()
     materia?: string;
 
+    @IsString()
+    @IsOptional()
+    fileName?: string;
+
     /** Fecha asociada al evento */
     @IsString()
     @IsOptional()
@@ -157,5 +162,9 @@ export class UnicoMailDto {
     @IsString()
     @IsOptional()
     hora?: string;
+
+    @IsString()
+    @IsOptional()
+    nombreGrupo?: string;
 
 }
