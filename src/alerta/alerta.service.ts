@@ -22,7 +22,6 @@ export class AlertaService {
   private readonly sgMail: SendGridMailService;
   private rolQueue;
   private uniqueQueue; 
-
   private templatesDir = path.join(process.cwd(), 'src', 'templates');
 
   constructor(private prisma: PrismaService,private readonly client: ServiceBusClient) {
