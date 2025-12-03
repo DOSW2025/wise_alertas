@@ -21,5 +21,7 @@ export enum TemplateEnum {
     CompletacionTutoriaTutor ='Se ha completado una tutoría',
     //Materales
     nuevoMaterialSubido = 'Se ha subido un nuevo material',
+    //chats
+    nuevoMensaje =  "Hay un nuevo mensaje del Grupo: "
 
 }
