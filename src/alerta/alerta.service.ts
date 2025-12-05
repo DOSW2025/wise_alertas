@@ -128,8 +128,10 @@ export class AlertaService {
   /** Crear notificación para un receptor */
   async registrarCorreoIndividual(informacion: UnicoMailDto) {
     const user = await this.getUsuarioPorEmail(informacion.email);
-    const subject = (TemplateEnum as any)[informacion.template] ?? informacion.template + `${informacion.nombreGrupo ? ' ' + informacion.nombreGrupo : ''}`;
-    await this.crearNotificacionEnBD(user.id, subject, informacion.resumen);
+    const subject = (TemplateEnum as any)[informacion.template];
+    const asunto = subject + `${informacion.nombreGrupo}`;
+    this.logger.debug(`Registrando notificación para ${informacion.email} con asunto: ${asunto}`);
+    await this.crearNotificacionEnBD(user.id, asunto, informacion.resumen);
   }
 
   /** Crear notificaciones para varios receptores */

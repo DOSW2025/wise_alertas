@@ -23,5 +23,4 @@ export enum TemplateEnum {
     nuevoMaterialSubido = 'Se ha subido un nuevo material',
     //chats
     nuevoMensaje =  "Hay un nuevo mensaje del Grupo: "
-
 }
