@@ -1,0 +1,52 @@
+name: Publish Artifact to Azure DevOps
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build NestJS
+        run: npm run build
+
+      # ZIP del build
+      - name: Create artifact zip
+        run: zip -r artifact.zip dist
+
+      # Instalar Azure CLI
+      - name: Install Azure CLI
+        uses: azure/cli@v2
+
+      - name: Login to Azure DevOps
+        run: |
+          echo "$(printf "%s"":$AZURE_DEVOPS_PAT")" | az devops login
+
+      - name: Upload to Azure Artifacts (Universal Package)
+        run: |
+          az artifacts universal publish \
+            --organization "$AZURE_ORG_URL" \
+            --feed "$AZURE_FEED_NAME" \
+            --name "nestjs-build" \
+            --version "$(date +'%Y.%m.%d.%H%M')" \
+            --description "Build automático desde GitHub Actions" \
+            --path artifact.zip
+        env:
+          AZURE_DEVOPS_PAT: ${{ secrets.AZURE_DEVOPS_PAT }}
+          AZURE_ORG_URL: ${{ secrets.AZURE_ORG_URL }}
+          AZURE_FEED_NAME: ${{ secrets.AZURE_FEED_NAME }}
