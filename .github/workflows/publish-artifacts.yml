@@ -37,6 +37,7 @@ jobs:
           az artifacts universal publish \
             --organization "$AZURE_ORG_URL" \
             --project "$AZURE_PROJECT" \
+            --scope project \
             --feed "$AZURE_FEED_NAME" \
             --name "nestjs-build" \
             --version "$(date +'%Y.%m.%d.%H%M')" \
