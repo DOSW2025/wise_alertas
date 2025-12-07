@@ -28,20 +28,16 @@ jobs:
       - name: Create artifact zip
         run: zip -r artifact.zip dist
 
-      - name: Get version from package.json
-        id: get_version
+      # Generación de versión SemVer válida
+      - name: Get next version
+        id: version
         run: |
-          if [ -f package.json ]; then
-            VERSION=$(node -p "require('./package.json').version")
-            echo "version=${VERSION}" >> $GITHUB_OUTPUT
-          else
-            # Crear versión basada en fecha y número de ejecución
-            DATE_PART=$(date +'%Y%m%d')
-            BUILD_NUMBER=${GITHUB_RUN_NUMBER}
-            # Combinar como parte del patch (máximo 2147483647)
-            # 20251207 < 2147483647, así que es válido
-            echo "version=1.0.${DATE_PART}" >> $GITHUB_OUTPUT
-          fi
+          YEAR=$(date +'%Y')
+          DAY=$(date +'%m%d')
+          VERSION="1.${YEAR}.${DAY}${GITHUB_RUN_NUMBER}"
+
+          echo "version=$VERSION"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Install Azure CLI
         run: |
@@ -55,7 +51,7 @@ jobs:
             --scope project \
             --feed "$AZURE_FEED_NAME" \
             --name "nestjs-build" \
-            --version "${{ steps.get_version.outputs.version }}" \
+            --version "${{ steps.version.outputs.version }}" \
             --description "Build desde GitHub Actions" \
             --path artifact.zip
         env:
