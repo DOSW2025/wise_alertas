@@ -50,7 +50,7 @@ jobs:
             --project "$AZURE_PROJECT" \
             --scope project \
             --feed "$AZURE_FEED_NAME" \
-            --name "nestjs-build" \
+            --name "wise_alertas" \
             --version "${{ steps.version.outputs.version }}" \
             --description "Build desde GitHub Actions" \
             --path artifact
