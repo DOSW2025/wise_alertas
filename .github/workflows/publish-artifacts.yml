@@ -25,13 +25,13 @@ jobs:
       - name: Build NestJS
         run: npm run build
 
-      # ZIP del build
       - name: Create artifact zip
         run: zip -r artifact.zip dist
 
-      # Instalar Azure CLI
+      # Instalar CLI de Azure (sin errores)
       - name: Install Azure CLI
-        uses: azure/cli@v2
+        run: |
+          curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
       - name: Login to Azure DevOps
         run: |
@@ -44,7 +44,7 @@ jobs:
             --feed "$AZURE_FEED_NAME" \
             --name "nestjs-build" \
             --version "$(date +'%Y.%m.%d.%H%M')" \
-            --description "Build automático desde GitHub Actions" \
+            --description "Build desde GitHub Actions" \
             --path artifact.zip
         env:
           AZURE_DEVOPS_PAT: ${{ secrets.AZURE_DEVOPS_PAT }}
