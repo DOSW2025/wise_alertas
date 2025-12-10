@@ -138,6 +138,10 @@ Marca todas las notificaciones del usuario como leídas.
       },
     },
   })
+  async readAll(@Param('userId') userId: string) {
+    const cantidad = await this.alertaService.markAllRead(userId);
+    return { mensaje: 'Notificaciones marcadas como leídas', cantidad };
+  }
 
   /**
    * Marca como leída una notificación específica.
@@ -146,21 +150,12 @@ Marca todas las notificaciones del usuario como leídas.
   @ApiOperation({
     summary: 'Marcar una notificación como leída',
     description: `
-Actualiza una notificación específica para marcarla como leída.
+    Actualiza una notificación específica para marcarla como leída.
 
-**Validaciones:**
-- El ID debe corresponder a una notificación existente.
-- Si la notificación ya estaba leída, no generará error; simplemente la mantiene como leída.
-- Si no existe, se retorna error 404.
-
-**Respuesta esperada:**
-\`\`\`json
-{
-  "mensaje": "Notificación marcada como leída",
-  "id": "10"
-}
-\`\`\`
-`
+    **Validaciones:**
+    - El ID debe corresponder a una notificación existente.
+    - Si la notificación ya estaba leída, no generará error; simplemente la mantiene como leída.
+    - Si no existe, se retorna error 404.`
   })
   @ApiParam({
     name: 'id',
@@ -222,25 +217,17 @@ Actualiza una notificación específica para marcarla como leída.
   @ApiOperation({
     summary: 'Eliminar una notificación',
     description: `
-Elimina una notificación de manera permanente según su ID.
+    Elimina una notificación de manera permanente según su ID.
 
-**Comportamiento:**
-- Solo elimina una notificación a la vez.
-- No afecta el historial de otros usuarios.
-- Útil para funcionalidades donde el usuario desea limpiar alertas.
+    **Comportamiento:**
+    - Solo elimina una notificación a la vez.
+    - No afecta el historial de otros usuarios.
+    - Útil para funcionalidades donde el usuario desea limpiar alertas.
 
-**Validaciones:**
-- El ID debe existir.
-- Si no existe, se retorna un 404.
-
-**Respuesta esperada:**
-\`\`\`json
-{
-  "mensaje": "Notificación eliminada",
-  "id": "10"
-}
-\`\`\`
-`
+    **Validaciones:**
+    - El ID debe existir.
+    - Si no existe, se retorna un 404.
+    `   
   })
   @ApiParam({
     name: 'id',
