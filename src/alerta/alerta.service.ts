@@ -12,6 +12,7 @@ import { NotificacionDto } from './dto/notificacion.dto';
 import { TemplateEnum } from './enums/template.enum';
 import { ServiceBusClient} from '@azure/service-bus';
 import { RolMailDto } from './dto/rolMail.dto';
+import { TypeEnum } from './enums/type.enum';
 
 
 dotenv.config();
@@ -37,7 +38,7 @@ export class AlertaService {
 
   async findByUser(userId: string): Promise<NotificacionDto[]> {
     try {
-      const res = await this.prisma.notification.findMany({
+      const res = await this.prisma.notifications.findMany({
         where: { userId },
         orderBy: { fechaCreacion: 'desc' },
       });
@@ -48,6 +49,7 @@ export class AlertaService {
         resumen: n.resumen,
         visto: n.visto,
         fechaCreacion: n.fechaCreacion,
+        type: n.type,
       }));
     } catch (err) {
       this.logger.error(`Error obteniendo notificaciones para usuario ${userId}:`, err);
@@ -57,7 +59,7 @@ export class AlertaService {
 
   async countUnread(userId: string) {
     try {
-      return await this.prisma.notification.count({ where: { userId, visto: false } });
+      return await this.prisma.notifications.count({ where: { userId, visto: false } });
     } catch (err) {
       this.logger.error(`Error contando notificaciones no leídas para usuario ${userId}:`, err);
       throw new HttpException('Error al contar notificaciones no leídas', HttpStatus.INTERNAL_SERVER_ERROR);
@@ -66,7 +68,7 @@ export class AlertaService {
 
   async deleteById(id: string) {
     try {
-      await this.prisma.notification.delete({ where: { id: Number(id) } });
+      await this.prisma.notifications.delete({ where: { id: Number(id) } });
     } catch (err: any) {
       this.logger.error(`Error eliminando notificación ${id}:`, err);
       if (err?.code === 'P2025' || /not found/i.test(err.message || '')) {
@@ -78,7 +80,7 @@ export class AlertaService {
 
   async markAllRead(userId: string) {
     try {
-      const res = await this.prisma.notification.updateMany({
+      const res = await this.prisma.notifications.updateMany({
         where: { userId, visto: false },
         data: { visto: true },
       });
@@ -91,7 +93,7 @@ export class AlertaService {
 
   async markRead(id: string) {
     try {
-      const res = await this.prisma.notification.update({
+      const res = await this.prisma.notifications.update({
         where: { id: Number(id) },
         data: { visto: true },
       });
@@ -108,19 +110,20 @@ export class AlertaService {
   //Crear notificaciones
 
   /** Crear notificación en BD */
-  private async crearNotificacionEnBD(userId: string, titulo: string, mensaje: string) {
-    await this.prisma.notification.create({
+  private async crearNotificacionEnBD(userId: string, titulo: string, mensaje: string, type: string) {
+    await this.prisma.notifications.create({
       data: {
         userId,
         asunto: titulo,
         resumen: mensaje,
+        type: type,
       },
     });
   }
 
   /** Buscar usuario por email */
   private async getUsuarioPorEmail(mail: string): Promise<User> {
-    const user = await this.prisma.usuario.findUnique({ where: { email: mail } });
+    const user = await this.prisma.usuarios.findUnique({ where: { email: mail } });
     if (!user) throw new NotFoundException('Usuario no encontrado');
     return user;
   }
@@ -129,9 +132,15 @@ export class AlertaService {
   async registrarCorreoIndividual(informacion: UnicoMailDto) {
     const user = await this.getUsuarioPorEmail(informacion.email);
     const subject = (TemplateEnum as any)[informacion.template];
-    const asunto = subject + `${informacion.nombreGrupo}`;
-    this.logger.debug(`Registrando notificación para ${informacion.email} con asunto: ${asunto}`);
-    await this.crearNotificacionEnBD(user.id, asunto, informacion.resumen);
+    const type = (TypeEnum as any)[informacion.type];
+    if (subject === TemplateEnum.nuevoMensaje) {
+      const asunto = subject + `${informacion.nombreGrupo}`;
+      this.logger.debug(`Registrando notificación para ${informacion.email} con asunto: ${asunto}`);
+      await this.crearNotificacionEnBD(user.id, asunto, informacion.resumen, type);
+    }else {
+      this.logger.debug(`Registrando notificación para ${informacion.email} con asunto: ${subject}`);
+      await this.crearNotificacionEnBD(user.id, subject, informacion.resumen, type);
+    }
   }
 
   /** Crear notificaciones para varios receptores */
@@ -206,9 +215,9 @@ export class AlertaService {
   }
 
   private async encontrarUsuariosPorRol(rol: string): Promise<User[]> {
-    const usuarios : User[] = await this.prisma.usuario.findMany({
+    const usuarios : User[] = await this.prisma.usuarios.findMany({
       where: {
-        rol: { nombre: rol },
+        roles: { nombre: rol },
       },
       select: {
         id: true,
@@ -241,6 +250,10 @@ export class AlertaService {
     this.rolQueue.subscribe({
       processMessage: async (message) => {
         
+        if (message.body.type === undefined || message.body.type === null) {
+          message.body.type = TypeEnum.INFORMACION;
+        }
+
         if (message.body.mandarCorreo === undefined || message.body.mandarCorreo === null) {
           message.body.mandarCorreo = true;
         }

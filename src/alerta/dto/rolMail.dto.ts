@@ -99,4 +99,12 @@ export class RolMailDto {
     })
     link?: string;
 
+    /**
+     * Tipo de notificación (e.g., 'info', 'alerta', 'recordatorio').
+     */    @IsString()
+    @ApiProperty({
+        example: 'info',
+        description: 'Tipo de notificación.'
+    })
+    type: string;
 }
