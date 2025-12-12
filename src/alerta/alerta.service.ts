@@ -251,7 +251,7 @@ export class AlertaService {
       processMessage: async (message) => {
         
         if (message.body.type === undefined || message.body.type === null) {
-          message.body.type = TypeEnum.INFORMACION;
+          message.body.type = TypeEnum.SUCCESS;
         }
 
         if (message.body.mandarCorreo === undefined || message.body.mandarCorreo === null) {
@@ -279,6 +279,10 @@ export class AlertaService {
     this.uniqueQueue.subscribe({
       processMessage: async (message) => {
 
+        if (message.body.type === undefined || message.body.type === null) {
+          message.body.type = TypeEnum.SUCCESS;
+        }
+        
         if (message.body.mandarCorreo === undefined || message.body.mandarCorreo === null) {
           message.body.mandarCorreo = true;
         }

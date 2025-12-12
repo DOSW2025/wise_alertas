@@ -36,7 +36,7 @@ model notifications {
   fechaCreacion DateTime @default(now())
   asunto        String
   resumen       String
-  type          String   @default("info")
+  type          String   @default("success")
   visto         Boolean  @default(false)
   usuarios      usuarios @relation(fields: [userId], references: [id], onDelete: Cascade)
 
