@@ -1,73 +1,397 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
+  output   = "../node_modules/.prisma/client"
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "postgresql"
 }
 
-model Notification {
+model estados_usuario {
+  id          Int        @id @default(autoincrement())
+  nombre      String     @unique
+  descripcion String?
+  activo      Boolean    @default(true)
+  created_at  DateTime   @default(now())
+  updated_at  DateTime
+  usuarios    usuarios[]
+}
+
+model materia {
+  id            String          @id
+  codigo        String          @unique
+  nombre        String
+  tema          tema[]
+  tutor_materia tutor_materia[]
+  tutoria       tutoria[]
+  forums        Forum[]
+  
+
+  @@index([codigo])
+}
+
+model notifications {
   id            Int      @unique @default(autoincrement())
   userId        String
   fechaCreacion DateTime @default(now())
   asunto        String
   resumen       String
+  type          String   @default("info")
   visto         Boolean  @default(false)
-  user          Usuario  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  usuarios      usuarios @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([id, userId])
-  @@map("notifications")
 }
 
-model Usuario {
-  id                                  String         @id @default(uuid())
-  email                               String         @unique
+model rating {
+  id            Int           @id @default(autoincrement())
+  sessionId     String        @unique
+  tutorId       String
+  raterId       String
+  score         Int
+  comment       String?
+  createdAt     DateTime      @default(now())
+  usuarios      usuarios      @relation(fields: [raterId], references: [id])
+  tutoria       tutoria       @relation(fields: [sessionId], references: [id_tutoria], onDelete: Cascade)
+  tutor_profile tutor_profile @relation(fields: [tutorId], references: [id_tutor])
+}
+
+model roles {
+  id          Int        @id @default(autoincrement())
+  nombre      String     @unique
+  descripcion String?
+  activo      Boolean    @default(true)
+  created_at  DateTime   @default(now())
+  updated_at  DateTime
+  usuarios    usuarios[]
+}
+
+model tema {
+  id         String  @id
+  materiaId  String
+  nombreTema String
+  materia    materia @relation(fields: [materiaId], references: [id], onDelete: Cascade)
+
+  @@index([materiaId])
+}
+
+model tutor_materia {
+  id            Int           @id @default(autoincrement())
+  tutorId       String
+  materiaId     String
+  materia       materia       @relation(fields: [materiaId], references: [id], onDelete: Cascade)
+  tutor_profile tutor_profile @relation(fields: [tutorId], references: [id_tutor], onDelete: Cascade)
+
+  @@unique([tutorId, materiaId])
+}
+
+model tutor_profile {
+  id_tutor      String          @id
+  bio           String?
+  reputacion    Float           @default(0)
+  rating        rating[]
+  tutor_materia tutor_materia[]
+  usuarios      usuarios        @relation(fields: [id_tutor], references: [id], onDelete: Cascade)
+}
+
+model tutoria {
+  id_tutoria                           String       @id
+  tutorId                              String
+  studentId                            String
+  materiaId                            String
+  codigoMateria                        String
+  scheduledAt                          DateTime
+  day                                  String
+  startTime                            String
+  endTime                              String
+  mode                                 Modalidad
+  status                               EstadoSesion @default(PENDIENTE)
+  linkConexion                         String?
+  lugar                                String?
+  comentarios                          String?
+  createdAt                            DateTime     @default(now())
+  rating                               rating?
+  materia                              materia      @relation(fields: [materiaId], references: [id])
+  usuarios_tutoria_studentIdTousuarios usuarios     @relation("tutoria_studentIdTousuarios", fields: [studentId], references: [id])
+  usuarios_tutoria_tutorIdTousuarios   usuarios     @relation("tutoria_tutorIdTousuarios", fields: [tutorId], references: [id])
+
+  @@index([codigoMateria])
+  @@index([materiaId])
+  @@index([status])
+  @@index([tutorId, scheduledAt])
+}
+
+model usuarios {
+  id                                  String             @id
+  email                               String             @unique
   nombre                              String
   apellido                            String
   telefono                            String?
   biografia                           String?
-  semestre                            Int            @default(1)
-  google_id                           String?        @unique @map("google_id")
-  avatar_url                          String?        @map("avatar_url")
-  rolId                               Int            @default(1) @map("rol_id")
-  estadoId                            Int            @default(1) @map("estado_id")
-  ultimo_login                        DateTime?      @map("ultimo_login")
+  semestre                            Int                @default(1)
+  google_id                           String?            @unique
+  avatar_url                          String?
+  rol_id                              Int                @default(1)
+  estado_id                           Int                @default(1)
+  ultimo_login                        DateTime?
   disponibilidad                      Json?
-  createdAt                           DateTime       @default(now()) @map("created_at")
-  updatedAt                           DateTime       @updatedAt @map("updated_at")
-  notifications                       Notification[]
-  estado                              EstadoUsuario  @relation(fields: [estadoId], references: [id])
-  rol                                 Rol            @relation(fields: [rolId], references: [id])
+  created_at                          DateTime           @default(now())
+  updated_at                          DateTime
+  Materiales                          Materiales[]
+  mensajesChat                        MensajeChat[]
+  miembrosGrupoChat                   MiembroGrupoChat[]
+  notifications                       notifications[]
+  rating                              rating[]
+  tutor_profile                       tutor_profile?
+  tutoria_tutoria_studentIdTousuarios tutoria[]       @relation("tutoria_studentIdTousuarios")
+  tutoria_tutoria_tutorIdTousuarios   tutoria[]       @relation("tutoria_tutorIdTousuarios")
+  estados_usuario                     estados_usuario @relation(fields: [estado_id], references: [id])
+  roles                               roles           @relation(fields: [rol_id], references: [id])
+  threads                             Thread[]
+  responses                           responses[]
+  reportes_realizados                 reportes_contenido[] @relation("usuario_reporta")
+  forums_created                       Forum[]
 
   @@index([email])
-  @@index([estadoId])
-  @@index([rolId])
-  @@map("usuarios")
+  @@index([estado_id])
+  @@index([rol_id])
 }
 
-model Rol {
-  id          Int       @id @default(autoincrement())
-  nombre      String    @unique
-  descripcion String?
-  activo      Boolean   @default(true)
-  createdAt   DateTime  @default(now()) @map("created_at")
-  updatedAt   DateTime  @updatedAt @map("updated_at")
-  usuarios    Usuario[]
-
-  @@map("roles")
+model Calificaciones {
+  id           Int        @id @default(autoincrement())
+  idMaterial   String
+  calificacion Int
+  comentario   String?
+  createdAt    DateTime   @default(now())
+  Materiales   Materiales @relation(fields: [idMaterial], references: [id], onDelete: Cascade)
 }
 
-model EstadoUsuario {
-  id          Int       @id @default(autoincrement())
-  nombre      String    @unique
-  descripcion String?
-  activo      Boolean   @default(true)
-  createdAt   DateTime  @default(now()) @map("created_at")
-  updatedAt   DateTime  @updatedAt @map("updated_at")
-  usuarios    Usuario[]
+model MaterialTags {
+  idTag      Int
+  idMaterial String
+  Materiales Materiales @relation(fields: [idMaterial], references: [id], onDelete: Cascade)
+  Tags       Tags       @relation(fields: [idTag], references: [id], onDelete: Cascade)
 
-  @@map("estados_usuario")
+  @@id([idTag, idMaterial])
+  @@index([idMaterial])
+}
+
+model Materiales {
+  id             String           @id
+  nombre         String
+  userId         String
+  url            String
+  extension      String
+  descripcion    String?
+  vistos         Int              @default(0)
+  descargas      Int              @default(0)
+  createdAt      DateTime         @default(now())
+  hash           String?          @unique
+  updatedAt      DateTime
+  Calificaciones Calificaciones[]
+  MaterialTags   MaterialTags[]
+  usuarios       usuarios         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Resumen        Resumen[]
+
+  @@index([userId])
+  @@index([extension])
+}
+
+model Resumen {
+  id         Int        @id @default(autoincrement())
+  idMaterial String
+  resumen    String
+  Materiales Materiales @relation(fields: [idMaterial], references: [id], onDelete: Cascade)
+}
+
+model Tags {
+  id           Int            @id @default(autoincrement())
+  tag          String         @unique
+  MaterialTags MaterialTags[]
+}
+
+model GrupoChat {
+  id                 String             @id @default(uuid())
+  nombre             String             @unique
+  creadoPor          String
+  fechaCreacion      DateTime           @default(now())
+  fechaActualizacion DateTime           @updatedAt
+  mensajes           MensajeChat[]
+  miembros           MiembroGrupoChat[]
+
+  @@index([nombre])
+  @@map("grupo_chat")
+}
+
+model MiembroGrupoChat {
+  id         String    @id @default(uuid())
+  grupoId    String
+  usuarioId  String
+  fechaUnion DateTime  @default(now())
+  grupo      GrupoChat @relation(fields: [grupoId], references: [id], onDelete: Cascade)
+  usuario    usuarios  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@unique([grupoId, usuarioId])
+  @@index([usuarioId])
+  @@index([grupoId])
+  @@map("miembro_grupo_chat")
+}
+
+model MensajeChat {
+  id            String    @id @default(uuid())
+  grupoId       String
+  usuarioId     String
+  contenido     String
+  fechaCreacion DateTime  @default(now())
+  fechaEdicion  DateTime?
+  grupo         GrupoChat @relation(fields: [grupoId], references: [id], onDelete: Cascade)
+  usuario       usuarios  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@index([grupoId, fechaCreacion])
+  @@index([usuarioId])
+  @@map("mensaje_chat")
+}
+
+enum EstadoSesion {
+  PENDIENTE
+  CONFIRMADA
+  CANCELADA
+  COMPLETADA
+  RECHAZADA
+}
+
+enum Modalidad {
+  VIRTUAL
+  PRESENCIAL
+}
+
+enum ThreadStatus {
+  open
+  closed
+  archived
+}
+
+model Thread {
+  id           String    @id @default(uuid())
+  author_id    String
+  title        String
+  content      String
+  status       ThreadStatus @default(open)
+  replies_count Int      @default(0)
+  views_count  Int       @default(0)
+  likes_count  Int       @default(0)
+  pinned       Boolean   @default(false)
+  created_at   DateTime  @default(now())
+  updated_at   DateTime?
+  deleted_at   DateTime?
+  forum_id     String?
+
+  author usuarios @relation(fields: [author_id], references: [id], onDelete: Cascade)
+  responses responses[]
+  forum     Forum?     @relation(fields: [forum_id], references: [id], onDelete: Cascade)
+
+  @@index([author_id])
+  @@index([status])
+  @@index([forum_id])
+}
+
+model Forum {
+  id         String   @id @default(uuid())
+  materiaId  String
+  title      String
+  description String?
+  likes_count Int      @default(0)
+  views_count Int      @default(0)
+  creator_id  String?
+  closed      Boolean  @default(false)
+  created_at DateTime @default(now())
+  updated_at DateTime?
+
+  materia materia @relation(fields: [materiaId], references: [id], onDelete: Cascade)
+  threads Thread[]
+  creator usuarios? @relation(fields: [creator_id], references: [id], onDelete: Cascade)
+
+  @@index([materiaId])
+  @@index([creator_id])
+}
+
+model responses {
+  id         String   @id @default(uuid())
+  thread_id  String
+  author_id  String
+  content    String
+  is_accepted Boolean @default(false)
+  created_at DateTime @default(now())
+  updated_at DateTime?
+  deleted_at DateTime?
+
+  thread Thread @relation(fields: [thread_id], references: [id], onDelete: Cascade)
+  author usuarios @relation(fields: [author_id], references: [id], onDelete: Cascade)
+
+  @@index([thread_id])
+  @@index([author_id])
+}
+
+enum TipoContenido {
+  THREAD
+  RESPONSE
+  MENSAJE_CHAT
+}
+
+enum MotivoReporte {
+  SPAM
+  LENGUAJE_OFENSIVO
+  ACOSO
+  CONTENIDO_INAPROPIADO
+  INCUMPLIMIENTO_NORMAS
+  FRAUDE_ACADEMICO
+  OTRO
+}
+
+enum EstadoReporte {
+  PENDIENTE
+  EN_REVISION
+  APROBADO
+  RECHAZADO
+  RESUELTO
+}
+
+model reportes_contenido {
+  id                  String         @id @default(uuid())
+  contenido_id        String
+  tipo_contenido      TipoContenido
+  usuario_reporta_id  String
+  motivo              MotivoReporte
+  descripcion         String?
+  estado              EstadoReporte  @default(PENDIENTE)
+  fecha_reporte       DateTime       @default(now())
+  fecha_revision      DateTime?
+  revisado_por        String?
+  notas_moderacion    String?
+  created_at          DateTime       @default(now())
+  updated_at          DateTime       @updatedAt
+
+  usuario_reporta usuarios @relation("usuario_reporta", fields: [usuario_reporta_id], references: [id], onDelete: Cascade)
+  logs_reporte logs_reporte[]
+
+  @@unique([contenido_id, usuario_reporta_id, tipo_contenido])
+  @@index([usuario_reporta_id])
+  @@index([estado])
+  @@index([tipo_contenido])
+  @@index([fecha_reporte])
+  @@index([contenido_id])
+}
+
+model logs_reporte {
+  id                  String    @id @default(uuid())
+  reporte_id          String
+  accion              String
+  usuario_id          String?
+  detalles            String?
+  timestamp           DateTime  @default(now())
+
+  reporte reportes_contenido @relation(fields: [reporte_id], references: [id], onDelete: Cascade)
+
+  @@index([reporte_id])
+  @@index([timestamp])
 }
