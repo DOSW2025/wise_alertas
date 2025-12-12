@@ -27,6 +27,7 @@
     "@nestjs/mapped-types": "*",
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/swagger": "^11.2.1",
+    "@prisma/adapter-pg": "^7.1.0",
     "@prisma/client": "^7.0.1",
     "@prisma/config": "^7.0.1",
     "@sendgrid/mail": "^8.1.6",
@@ -83,10 +84,10 @@
     ],
     "coverageDirectory": "../coverage",
     "coverageReporters": [
-    "html",
-    "text",
-    "lcov"
-  ],
+      "html",
+      "text",
+      "lcov"
+    ],
     "testEnvironment": "node"
   }
 }
