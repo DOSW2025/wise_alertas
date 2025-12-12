@@ -52,6 +52,15 @@ export class UnicoMailDto {
         description: 'Indica si debe registrarse una notificación en la Base de Datos.'
     })
     guardar!: boolean;
+
+    /** Tipo de notificación */
+    @IsString()
+    @ApiProperty({
+        required: false,
+        example: 'info',
+        description: 'Tipo de notificación, como info, success, warning, error, achievement.'
+    })
+    type!: string;
     
     /** Indica si realmente debe enviarse el correo */
     @IsOptional()
