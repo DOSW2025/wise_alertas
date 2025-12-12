@@ -132,7 +132,7 @@ export class AlertaService {
   async registrarCorreoIndividual(informacion: UnicoMailDto) {
     const user = await this.getUsuarioPorEmail(informacion.email);
     const subject = (TemplateEnum as any)[informacion.template];
-    const type = (TypeEnum as any)[informacion.type];
+    const type = (TypeEnum as any)[informacion.type.toUpperCase()];
     if (subject === TemplateEnum.nuevoMensaje) {
       const asunto = subject + `${informacion.nombreGrupo}`;
       this.logger.debug(`Registrando notificación para ${informacion.email} con asunto: ${asunto}`);
