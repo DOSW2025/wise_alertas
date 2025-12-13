@@ -13,6 +13,68 @@ export class AlertaController {
   constructor(private readonly alertaService: AlertaService) {}
 
   /**
+   * Retorna el número de notificaciones de chat no leídas de un usuario.
+   */
+  @Get('unread-chat-count/:userId')
+  @ApiOperation({
+    summary: 'Contador de notificaciones de chat no leídas',
+    description: `
+Retorna el número de notificaciones no leídas de chat (asunto comienza con "Hay un nuevo mensaje").
+
+**Uso esperado:**
+- Este endpoint permite consultar específicamente las notificaciones de chat no leídas.
+- Útil para mostrar un badge o contador específico para mensajes de chat.
+
+**Validaciones:**
+- El \`userId\` debe existir en el sistema.
+- Si el usuario no tiene notificaciones de chat sin leer, retornará **Count = 0**.
+
+**Respuesta esperada:**
+\`\`\`json
+{ "Count": 2 }
+\`\`\`
+`
+  })
+  @ApiParam({
+    name: 'userId',
+    description: 'ID del usuario del cual se quiere conocer el conteo de notificaciones de chat no leídas',
+    example: 'user-123'
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Número de notificaciones de chat no leídas.',
+    schema: {
+      example: { Count: 2 },
+    },
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Petición inválida (por ejemplo, formato incorrecto de userId).',
+    schema: {
+      example: {
+        statusCode: 400,
+        message: ['userId must be a string'],
+        error: 'Bad Request',
+      },
+    },
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Error interno al obtener el número de notificaciones de chat no leídas.',
+    schema: {
+      example: {
+        statusCode: 500,
+        message: 'Error al contar notificaciones de chat no leídas',
+        error: 'Internal Server Error',
+      },
+    },
+  })
+  async unreadChatCount(@Param('userId') userId: string) {
+    const unreadCount = await this.alertaService.countUnreadChatNotifications(userId);
+    return { Count: unreadCount };
+  }
+
+  /**
    * Retorna el número de notificaciones no leídas de un usuario.
    */
   @Get('unread-count/:userId')
