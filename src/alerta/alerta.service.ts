@@ -66,6 +66,23 @@ export class AlertaService {
     }
   }
 
+  async countUnreadChatNotifications(userId: string) {
+    try {
+      return await this.prisma.notifications.count({
+        where: {
+          userId,
+          visto: false,
+          asunto: {
+            startsWith: 'Hay un nuevo mensaje',
+          },
+        },
+      });
+    } catch (err) {
+      this.logger.error(`Error contando notificaciones de chat no leídas para usuario ${userId}:`, err);
+      throw new HttpException('Error al contar notificaciones de chat no leídas', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
   async deleteById(id: string) {
     try {
       await this.prisma.notifications.delete({ where: { id: Number(id) } });
