@@ -1,0 +1,30 @@
+{
+  "test_config": {
+    "host": "localhost",
+    "port": 3000,
+    "protocol": "http",
+    "max_error_rate": 9,
+    "endpoints": [
+      "/notificacion/unread-count/{userId}",
+      "/notificacion/unread-chat-count/{userId}",
+      "/notificacion/{userId}"
+    ]
+  },
+  "load_scenarios": {
+    "light": {
+      "threads": 10,
+      "ramp_time": 10,
+      "loops": 5
+    },
+    "medium": {
+      "threads": 50,
+      "ramp_time": 30,
+      "loops": 10
+    },
+    "heavy": {
+      "threads": 100,
+      "ramp_time": 60,
+      "loops": 20
+    }
+  }
+}
