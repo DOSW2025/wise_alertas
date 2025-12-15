@@ -176,4 +176,20 @@ export class UnicoMailDto {
     @IsOptional()
     nombreGrupo?: string;
 
+    @IsString()
+    @IsOptional()
+    taggedBy?: string;
+
+    @IsString()
+    @IsOptional()
+    threadTitle?: string;
+
+    @IsString()
+    @IsOptional()
+    createdBy?: string;
+
+    @IsString()
+    @IsOptional()
+    mentionedBy?: string;
+
 }

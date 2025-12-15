@@ -22,5 +22,10 @@ export enum TemplateEnum {
     //Materales
     nuevoMaterialSubido = 'Se ha subido un nuevo material',
     //chats
-    nuevoMensaje =  "Hay un nuevo mensaje del Grupo: "
+    nuevoMensaje =  "Hay un nuevo mensaje del Grupo: ",
+    //foros
+    nuevaRespuesta = 'Hay una nueva respuesta en el foro: ',
+    mencionThread = 'Has sido mencionado en un hilo del foro: ',
+    mencionRespuesta = 'Has sido mencionado en una respuesta del foro: ',
+    nuevoThreadEnForo = 'Se ha creado un nuevo hilo en el foro: ',
 }
